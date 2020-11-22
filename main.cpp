@@ -20,19 +20,15 @@ using namespace std;
                                 mvwprintw(win,10,10,"hello");
                                 wrefresh(win);
                         }
-
                 }
                 */
-
-
-
 struct tile{
 	int color=0;
 	char c = 'Z';
 	bool used = false;
 };
 
-void readFile(tile array[][128])
+void readFile(tile array[][128], string StringTemp)
 {
         string temp;
         int i = 0;
@@ -41,7 +37,10 @@ void readFile(tile array[][128])
         //if(read_file==0)
         ifstream infile;
         //Open the designated file
-        infile.open("practice.txt");
+        //infile.open("practice.txt");
+	infile.open(StringTemp);
+	
+	
          //If file was open sucessfully then eneter
         if(infile)
         {
@@ -68,12 +67,21 @@ void readFile(tile array[][128])
                 infile.close();
 
         }
-
+	/*
+	attron(COLOR_PAIR(5));
+	mvwprintw(win,5 ,5," ");
+	wrefresh(win);
+	*/
 }
 
 
 int main()
 {
+	string StringTemp;
+	cout<<"WHAT FILE"<<endl;
+	cin>>StringTemp;
+	StringTemp+=".txt";
+
 	initscr();
 	noecho();
 	keypad(stdscr, true);
@@ -91,7 +99,7 @@ int main()
 
 	
 	tile array[128][128];
-	readFile(array);
+	readFile(array, StringTemp);
 
 	//Assign the colors, could do this within readfile, this loop uncessary 
 	for(int i = 0; i<128; ++i)
@@ -126,7 +134,6 @@ int main()
 
 
 
-
 	int cursorX = COLS/2;
         int cursorY= LINES/2;
 
@@ -149,17 +156,19 @@ int main()
 	int FrupalX = 0;
 
 
-	//int heroX = cursorX;
-	//int heroY = cursorY;
+	int heroX = cursorX;
+	int heroY = cursorY;
 
 	WINDOW * win;
 	win = newwin(LINES, COLS-border, 0, border);
 	refresh();
 
+
 	//First four = sides, last four = corners
 	wborder(win, '#', ' ', ' ', ' ','#', ' ', '#', ' ');
 	wrefresh(win);
 
+	//readFile(array,stdscr);
 
 	int  choice = 'a';
 
@@ -167,51 +176,93 @@ int main()
 	{
 		choice = wgetch(stdscr);
 
+		if(isdigit(choice))
+                {
+			int i = choice - '0';
 
+			switch(i)
+			{
+				case 1:
+					if(heroY-1 >= -1)
+						--heroY;
+					else
+						heroY = 0;
+					break;
 
-		switch(choice)
+				case 2:
+					if(heroY+1 < LINES+1)
+                                                ++heroY;
+                                        else
+                                                heroY = LINES-1;
+                                        break;
+
+				case 3:
+					if(heroX+1 < border+1)
+                                                ++heroX;
+                                        else
+                                                heroX = border-1;
+
+                                        break;
+				case 4:
+					if(heroX-1 >= -1)
+                                                --heroX;
+                                        else
+                                                heroX = 0;
+                                        break;
+
+			}
+                }
+		else
 		{
-			
-			//These four cases is when user wants
-			//to move cursor, and these cases move the
-			//cursor accordingly.
-			case KEY_UP:
-				if(cursorY-1 >= -1)
-					--cursorY;
-				else
-					cursorY = 0;
-				break;
-
-			case KEY_DOWN:
-				if(cursorY+1 < LINES+1)
-					++cursorY;
-				else
-					cursorY = LINES-1;
-
-				break;
 
 
-			case KEY_RIGHT:
-				if(cursorX+1 < border+1)
-					++cursorX;
-				else
-					cursorX = border-1;
-				break;
 
-			case KEY_LEFT:
-				if(cursorX-1 >= -1)
-					--cursorX;
-				else
-					cursorX = 0;
-				break;
 
-			
+			switch(choice)
+			{
+				
+				//These four cases is when user wants
+				//to move cursor, and these cases move the
+				//cursor accordingly.
+				case KEY_UP:
+					if(cursorY-1 > 0)
+						--cursorY;
+					else
+						cursorY = 0;
+					break;
+
+				case KEY_DOWN:
+					if(cursorY+1 < LINES)
+						++cursorY;
+					else
+						cursorY = LINES-1;
+
+					break;
+
+
+				case KEY_RIGHT:
+					if(cursorX+1 < border)
+						++cursorX;
+					else
+						cursorX = border-1;
+					break;
+
+				case KEY_LEFT:
+					if(cursorX-1 > 0)
+						--cursorX;
+					else
+						cursorX = 0;
+					break;
+
+				
+			}
+
 		}
+		/*
 		//Within the border
-		if((cursorY < LINES && cursorY >= 0) && (cursorX < border && cursorX >= 0))
+		if((heroY < LINES && heroY >= 0) && (heroX < border && heroX >= 0))
 		{
 			//This is for the hero later on don't need to worry about it now
-			/*
 			int checkJ = heroX-1;
 			int checkI = heroY;
 			int i = heroY;
@@ -242,7 +293,7 @@ int main()
 				if((checkI >= 0 && checkI <LINES) && (checkJ >=0 && checkJ < border))
 				{
 					 attron(COLOR_PAIR(array[checkI+FrupalY][checkJ+FrupalX].color));
-					 mvwprintw(stdscr,checkI-FrupalY,cursorX-FrupalX," ");
+					 mvwprintw(stdscr,checkI-FrupalY,heroX-FrupalX," ");
 					 array[checkI+FrupalY][checkJ+FrupalX].used = true;
 				}
 				if(k==6)
@@ -252,14 +303,17 @@ int main()
 					//check right
 					checkJ = j+1;
 			}
-			*/
+			
 			attron(COLOR_PAIR(array[cursorY+FrupalY][cursorX+FrupalX].color));
 			mvwprintw(stdscr,cursorY,cursorX," ");
 			array[cursorY+FrupalY][cursorX+FrupalX].used = true;
 		}
+		*/
+
 
 		//Reset the map to all black, this will probably only
 		//be needed when we go to another section of the map, don't need to do it everytime.
+		/*
 		for(int i = MinY; i<MaxY; ++i)
                 {
                         for(int j = MinX; j<MaxX; ++j)
@@ -269,63 +323,63 @@ int main()
 
                         }
                 }
+		*/
 
 		//Explore down the map
-		if(cursorY == LINES)
+		if(heroY == LINES)
 		{
-			--cursorY;
+			--heroY;
 
-			temp = cursorY + MinY;
+			temp = heroY + MinY;
 
 			MinY = MaxY - (LINES/2);
 			MaxY = MaxY + (LINES/2);
 
-			if(MaxY > 128)
+			if(MaxY > 127)
 			{
 				MaxY = 128;
 				MinY = 128- LINES;
 			}
 			FrupalY = MinY;
 
-			cursorY = abs((temp-MinY));
-                        cursorX = cursorX;
-
-
+			heroY = abs((temp-MinY));
+			heroX = heroX;
 
 		}
 		//Go back up 
-		else if(cursorY == -1)
+		else if(heroY == -1)
 		{
-			++cursorY;
-			temp = cursorY + MinY;
+			++heroY;
+			temp = heroY + MinY;
 
-			MinY = MinY - (LINES/2);
-			MaxY = MinY + (LINES/2);
+			MinY -= (LINES/2);
+			MaxY -=(LINES/2);
 
-			if(MinY < 128)
+			if(MinY <= -1)
 			{
 				MaxY = LINES;
 				MinY = 0;
 			}
+
 			FrupalY = MinY;
 
 
-			cursorY = abs((temp-MinY));
-			cursorX = cursorX;
+			heroY = abs((temp-MinY));
+			heroX = heroX;
 
 		}
 		
 		//Explore right
-		else if(cursorX == border)
+		else if(heroX == border)
 		{
-			--cursorX;
+			--heroX;
 
-			temp = cursorX + MinX;
+			temp = heroX + MinX;
 
 			MinX = MaxX - (border/2);
 			MaxX = MaxX + (border/2);
 
-			if(MaxX > 128)
+			if(MaxX > 127)
 			{
 				MaxX = 128;
 				MinX = 128- border;
@@ -333,24 +387,30 @@ int main()
 			FrupalX = MinX;
 
 
-			cursorX = abs(temp-MinX);
-                        cursorY = cursorY;
+			heroX = abs(temp-MinX);
+                        heroY = heroY;
 		}
 
 		//explore left
-		else if(cursorX == -1)
+		else if(heroX == -1)
 		{
-			++cursorX;
+			++heroX;
 
 			if(MinX != 0)
 			{
 
-				temp = cursorX + MinX;
+				temp = heroX + MinX;
 
-				MinX = MinX - (border/2);
-				MaxX = MinX + (border/2);
-
-				if(MinX < 128)
+				MinX -= (border/2);
+				MaxX -= (border/2);
+				/*
+				if(MaxX < 128)
+				{
+					MaxX = border;
+					MinX = 0;
+				}
+				*/
+				if(MinX <= -1)
 				{
 					MaxX = border;
 					MinX = 0;
@@ -358,13 +418,79 @@ int main()
 				FrupalX = MinX;
 
 
-				cursorX = abs(temp-MaxX);
-				cursorY = cursorY;
+				heroX = abs(temp-MinX);
+				heroY = heroY;
 			}
 
-
+	//		array[heroY+FrupalY][heroX+FrupalX].used = true;
 		}
+		/*
+		for(int i = MinY; i<MaxY; ++i)
+                {
+                        for(int j = MinX; j<MaxX; ++j)
+                        {
+                                        attron(COLOR_PAIR(3));
+                                        mvwprintw(stdscr,i -FrupalY ,j-FrupalX," ");
 
+                        }
+                }
+		*/
+
+		for(int i = 0; i<LINES; ++i)
+                {
+                        for(int j = 0; j<border; ++j)
+                        {
+                                        attron(COLOR_PAIR(3));
+                                        mvwprintw(stdscr,i ,j," ");
+
+                        }
+                }
+
+
+		if((heroY < LINES && heroY >= 0) && (heroX < border && heroX >= 0))
+		{
+			//This is for the hero later on don't need to worry about it now
+			int checkJ = heroX-1;
+			int checkI = heroY;
+			int i = heroY;
+			int j = heroX;
+			for(int k = 0; k<8;k++)
+			{
+				//If we are at 2 or 4 then
+				//Go up or down 2D array.
+				if(k == 2 || k == 4)
+				{
+					if(k==4)
+						//Up 2D array
+						checkI = i-1;
+					else
+						//Down 2D array
+						checkI = i+1;
+					//Left
+					checkJ = j-1;
+				}
+				else if(k==6)
+                                {
+					//Check upper cell from original cell we are checking
+                                        checkI = i-1;
+					//Stay same column
+                                        checkJ = j;
+                                }
+				//Don't go outside the boundries of array
+				if((checkI >= 0 && checkI <LINES) && (checkJ >=0 && checkJ < border))
+				{
+					 //attron(COLOR_PAIR(array[checkI+FrupalY][checkJ+FrupalX].color));
+					 //mvwprintw(stdscr,checkI-FrupalY,heroX-FrupalX," ");
+					 array[checkI+FrupalY][checkJ+FrupalX].used = true;
+				}
+				if(k==6)
+					//check down
+					checkI = i+1;
+				else
+					//check right
+					checkJ = j+1;
+			}
+		}
 		//Print the Grovnicks that are used
 		for(int i = MinY; i<MaxY; ++i)
 		{
@@ -378,10 +504,8 @@ int main()
 
 			}
 		}
-		/*
 		attron(COLOR_PAIR(6));
-		mvwprintw(stdscr,cursorY, cursorX, "@");
-		*/
+		mvwprintw(stdscr,heroY, heroX, "@");
 
 		wmove(stdscr,cursorY, cursorX);
                 refresh();
