@@ -32,4 +32,5 @@ class Water : public TileType
     bool canEnter(const Hero& theHero) const override;
     int energyCost() const override;
     int color() const override;
-}
+};
+
