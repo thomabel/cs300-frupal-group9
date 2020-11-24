@@ -6,16 +6,6 @@ November 2020
 using namespace std;
 
 
-struct tool
-{
-    int num = 0;
-};
-
-struct obstacle
-{
-    int num = 0;
-};
-
 class hero
 {
     public:
