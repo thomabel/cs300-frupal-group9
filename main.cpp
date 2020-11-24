@@ -2,9 +2,7 @@
 #include<vector>
 #include<cstring>
 #include <string>
-#include <stdio.h>      /* printf, scanf, puts, NULL */
-#include <stdlib.h>     /* srand, rand */
-#include <time.h>       /* time */
+#include <cmath>
 
 #include<fstream>
 #include<iostream>
@@ -28,7 +26,52 @@ struct tile{
 	bool used = false;
 };
 
-void readFile(tile array[][128], string StringTemp)
+const int MAPSIZE = 128;
+void WriteFile(tile array[][128])
+{
+        //Variable: Outfile
+        ofstream outfile;
+        //Open the data.txt files
+        outfile.open("Custom.txt");
+        //Clear what was in function
+        outfile.clear();
+        //Close the file
+        outfile.close();
+        //Reopen another file
+        outfile.open("Custom.txt", ios::app);
+
+
+        //Loop through list.
+
+        for(int i=0;i<MAPSIZE;++i)
+        {
+                for(int j = 0; j<MAPSIZE; ++j)
+                {
+			switch(array[i][j].c)
+			{
+				case 'W':
+					outfile<<"W";
+					break;
+				case 'M':
+					outfile<<"M";
+					break;
+				case 'S':
+					outfile<<"S";
+					break;
+				case 'G':
+					outfile<<"G";
+
+					break;
+			}
+
+                }
+                outfile<<endl;
+        }
+        //Close the file
+        outfile.close();
+}
+
+void readFile(tile array[][128], string StringTemp, WINDOW * win)
 {
         string temp;
         int i = 0;
@@ -56,6 +99,26 @@ void readFile(tile array[][128], string StringTemp)
                                         j=0;
                                 }
                                 array[i][j].c = temp[k];
+
+				switch(array[i][j].c)
+				{
+					case 'W':
+						array[i][j].color = 1;
+						break;
+					case 'M':
+						array[i][j].color = 2;
+						break;
+					case 'S':
+						array[i][j].color = 5;
+						break;
+					case 'G':
+						array[i][j].color = 4;
+						break;
+				}
+
+
+
+
                                 ++j;
 
                         }
@@ -67,11 +130,11 @@ void readFile(tile array[][128], string StringTemp)
                 infile.close();
 
         }
-	/*
-	attron(COLOR_PAIR(5));
+	
+	//attron(COLOR_PAIR(5));
+	wattron(win,COLOR_PAIR(5));
 	mvwprintw(win,5 ,5," ");
-	wrefresh(win);
-	*/
+//	wrefresh(win);
 }
 
 
@@ -80,6 +143,7 @@ int main()
 	string StringTemp;
 	cout<<"WHAT FILE"<<endl;
 	cin>>StringTemp;
+	cin.ignore(100,'\n');
 	StringTemp+=".txt";
 
 	initscr();
@@ -99,7 +163,7 @@ int main()
 
 	
 	tile array[128][128];
-	readFile(array, StringTemp);
+	//readFile(array, StringTemp);
 
 	//Assign the colors, could do this within readfile, this loop uncessary 
 	for(int i = 0; i<128; ++i)
@@ -138,9 +202,9 @@ int main()
         int cursorY= LINES/2;
 
 	
-	//int MaxScreenX= border - 1;
+	//int MaxScreenX= border;
 
-	//int MaxScreenY = LINES - 1;
+	//int MaxScreenY = LINES;
 
 	int MaxX= border;
 
@@ -166,6 +230,8 @@ int main()
 
 	//First four = sides, last four = corners
 	wborder(win, '#', ' ', ' ', ' ','#', ' ', '#', ' ');
+	wrefresh(win);
+	readFile(array, StringTemp, win);
 	wrefresh(win);
 
 	//readFile(array,stdscr);
@@ -211,6 +277,8 @@ int main()
                                         break;
 
 			}
+			//cursorX = heroX-1;
+			//cursorY = heroY;
                 }
 		else
 		{
@@ -335,6 +403,9 @@ int main()
 			MinY = MaxY - (LINES/2);
 			MaxY = MaxY + (LINES/2);
 
+			if(MaxY - MinY < LINES)
+				++MaxY;
+
 			if(MaxY > 127)
 			{
 				MaxY = 128;
@@ -344,6 +415,7 @@ int main()
 
 			heroY = abs((temp-MinY));
 			heroX = heroX;
+			//array[heroY+FrupalY][heroX+FrupalX].used = true;
 
 		}
 		//Go back up 
@@ -378,6 +450,9 @@ int main()
 
 			MinX = MaxX - (border/2);
 			MaxX = MaxX + (border/2);
+
+			if(MaxX - MinX < border)
+                                ++MaxX;
 
 			if(MaxX > 127)
 			{
@@ -422,7 +497,7 @@ int main()
 				heroY = heroY;
 			}
 
-	//		array[heroY+FrupalY][heroX+FrupalX].used = true;
+			//array[heroY+FrupalY][heroX+FrupalX].used = true;
 		}
 		/*
 		for(int i = MinY; i<MaxY; ++i)
@@ -435,6 +510,7 @@ int main()
                         }
                 }
 		*/
+		
 
 		for(int i = 0; i<LINES; ++i)
                 {
@@ -454,41 +530,47 @@ int main()
 			int checkI = heroY;
 			int i = heroY;
 			int j = heroX;
-			for(int k = 0; k<8;k++)
+			for(int l = 1; l< 3; l++)
 			{
-				//If we are at 2 or 4 then
-				//Go up or down 2D array.
-				if(k == 2 || k == 4)
+				for(int k = 0; k<8;k++)
 				{
-					if(k==4)
-						//Up 2D array
-						checkI = i-1;
+					//If we are at 2 or 4 then
+					//Go up or down 2D array.
+					if(k == 2 || k == 4)
+					{
+						if(k==4)
+							//Up 2D array
+							checkI = i-l;
+						else
+							//Down 2D array
+							checkI = i+l;
+						//Left
+						checkJ = j-l;
+					}
+					else if(k==6)
+					{
+						//Check upper cell from original cell we are checking
+						checkI = i-l;
+						//Stay same column
+						checkJ = j;
+					}
+					//Don't go outside the boundries of array
+					if((checkI >= 0 && checkI <LINES) && (checkJ >=0 && checkJ < border))
+					{
+						 //attron(COLOR_PAIR(array[checkI+FrupalY][checkJ+FrupalX].color));
+						 //mvwprintw(stdscr,checkI-FrupalY,heroX-FrupalX," ");
+						 array[checkI+FrupalY][checkJ+FrupalX].used = true;
+					}
+					if(k==6)
+						//check down
+						checkI = i+l;
+
 					else
-						//Down 2D array
-						checkI = i+1;
-					//Left
-					checkJ = j-1;
+					{
+						//check right
+						checkJ = j+l;
+					}
 				}
-				else if(k==6)
-                                {
-					//Check upper cell from original cell we are checking
-                                        checkI = i-1;
-					//Stay same column
-                                        checkJ = j;
-                                }
-				//Don't go outside the boundries of array
-				if((checkI >= 0 && checkI <LINES) && (checkJ >=0 && checkJ < border))
-				{
-					 //attron(COLOR_PAIR(array[checkI+FrupalY][checkJ+FrupalX].color));
-					 //mvwprintw(stdscr,checkI-FrupalY,heroX-FrupalX," ");
-					 array[checkI+FrupalY][checkJ+FrupalX].used = true;
-				}
-				if(k==6)
-					//check down
-					checkI = i+1;
-				else
-					//check right
-					checkJ = j+1;
 			}
 		}
 		//Print the Grovnicks that are used
@@ -515,6 +597,7 @@ int main()
 
 
 	}
+	WriteFile(array);
 
 	endwin();
 
