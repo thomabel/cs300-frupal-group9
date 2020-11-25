@@ -1,4 +1,18 @@
-const MAPSIZE = 128;
+#include<ncurses.h>
+#include<vector>
+#include<cstring>
+#include <string>
+#include <cmath>
+        
+#include<fstream>
+#include<iostream>
+using namespace std;
+/*
+#include "Tile.h"
+#include "TileType.h"
+#include"TileOccupant.h"
+*/
+int MAPSIZE = 128;
 
 class Map
 {

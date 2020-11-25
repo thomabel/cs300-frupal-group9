@@ -1,19 +1,18 @@
 #include"Map.h"
 
-
 Map::Map()
 {
 	//Default Map?
 }
-
 Map::Map(string srcFile)
 {
-	if(!(loadFile(string)))
+	if(!(loadFile(srcFile)))
 	{
 		cout<<"File cannot open"<<endl;
 	}
 }
 
+//Read in the map
 bool Map::loadFile(string src)
 {
 
@@ -47,21 +46,23 @@ bool Map::loadFile(string src)
 				switch(temp[k])
 				{               
 					case 'W':
-						tileArray[i][j].type = new Water;//Color num 1
+						tileArray[i][j].type = new Water;//Color num 4
 						break;
 					case 'M':
-						tileArray[i][j].type = new Wall;//Color num 2
+						tileArray[i][j].type = new Wall;//Color num 7
 						break;
 					case 'S':
 						tileArray[i][j].type = new Swamp; //Color num 5
 						break;
 					case 'G':
-						tileArray[i][j].type = new Meadow; //Color num 4
+						tileArray[i][j].type = new Meadow; //Color num 2
 						break;
 				}
 
 
                                 ++j;
+
+				//How should we go about occupants?
 
                         }
 
@@ -142,6 +143,7 @@ bool Map::isTileDiscovered(int row, int col)
 	return false;
 }
 
+//Display what is discovered
 void Map::displayMap(WINDOW * win)
 {
 
@@ -152,6 +154,7 @@ void Map::displayMap(WINDOW * win)
 			{
 				if(tileArray[i][j].revealed)
 				{
+
 					attron(COLOR_PAIR(tileArray[i][j].type->color()));
 					mvwprintw(win,i -MinY ,j-MinX," ");
 				}

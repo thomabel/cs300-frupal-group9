@@ -189,12 +189,26 @@ int main()
                 }
 	}
 	start_color();
+
+
+
 	init_pair(1, COLOR_YELLOW, COLOR_BLUE);
 	init_pair(2, COLOR_GREEN, COLOR_WHITE);
 	init_pair(3, COLOR_BLACK, COLOR_BLACK);
 	init_pair(4, COLOR_BLACK, COLOR_GREEN);
 	init_pair(5, COLOR_BLACK, COLOR_MAGENTA);
 	init_pair(6, COLOR_YELLOW, COLOR_RED);
+
+	// For the actual game
+
+	/*
+	init_pair(2, COLOR_BLACK, COLOR_GREEN);
+	init_pair(3, COLOR_BLACK, COLOR_BLACK);
+	init_pair(4, COLOR_WHITE, COLOR_BLUE);
+	init_pair(5, COLOR_BLACK, COLOR_MAGENTA);
+        init_pair(6, COLOR_YELLOW, COLOR_RED);
+        init_pair(7, COLOR_BLACK, COLOR_WHITE);
+	*/
 
 
 
@@ -233,6 +247,10 @@ int main()
 	wrefresh(win);
 	readFile(array, StringTemp, win);
 	wrefresh(win);
+
+	mvwprintw(win, 0, (COLS-border)/2, "HI");
+	wrefresh(win);
+
 
 	//readFile(array,stdscr);
 
@@ -414,7 +432,7 @@ int main()
 			FrupalY = MinY;
 
 			heroY = abs((temp-MinY));
-			heroX = heroX;
+	//		heroX = heroX;
 			//array[heroY+FrupalY][heroX+FrupalX].used = true;
 
 		}
@@ -437,7 +455,7 @@ int main()
 
 
 			heroY = abs((temp-MinY));
-			heroX = heroX;
+	//		heroX = heroX;
 
 		}
 		
@@ -463,7 +481,7 @@ int main()
 
 
 			heroX = abs(temp-MinX);
-                        heroY = heroY;
+          //              heroY = heroY;
 		}
 
 		//explore left
@@ -494,7 +512,7 @@ int main()
 
 
 				heroX = abs(temp-MinX);
-				heroY = heroY;
+	//			heroY = heroY;
 			}
 
 			//array[heroY+FrupalY][heroX+FrupalX].used = true;

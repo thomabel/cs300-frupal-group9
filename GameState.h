@@ -1,10 +1,14 @@
 
+#include"Map.h"
+
 //Screen size
-//int MaxScreenX = 0; //COLS
+int MaxScreenX = 0; //COLS
+
+
 int MaxScreenY = 0; //LINES
 
 //The max we can go on the screen
-int border = 0; // MaxScreenX for frupal Map
+int MenuBorder = 0; // MaxScreenX for frupal Map
 
 //Map coordinates (within array)
 int MaxX= 0;
@@ -15,7 +19,8 @@ int MinY = 0;
 class GameState
 {
 	public:
-		GameState(string mapSrcFile);
+		
+		GameState(string MapsrcFile);
 		
 		//Do we Need this??
 		/*
@@ -23,18 +28,25 @@ class GameState
 		int getHeroCol();
 		bool moveHeroTo( int row, int col);
 		*/
-		void travel(char direction, WINDOW * win);
+		void travel(char & direction, WINDOW * win, WINDOW * menu);
+
 
 		void cursorTravel(char direction);
+
+		bool HeroTravel(char & direction, WINDOW * menu);
+
 		bool ExpandMap();
+
+		bool ccupantCheck(char & direction, WINDOW * win);
 
 		void HeroVision();
 	
 	private:
 		Hero theHero;
 		Map map;
-		int CursorX;
-		int CursorY;
-		int HeroX;
-		int HeroY;
+		UserInterface UI;
+		int cursorX;
+		int cursorY;
+		int heroX;
+		int heroY;
 };
