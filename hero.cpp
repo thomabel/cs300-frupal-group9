@@ -10,6 +10,17 @@ hero::hero()
 {
     hasBinoculars_ = false;
     hasShip_ = false;
+    whiffles_ = 1000;
+    energy_ = 100;
+}
+
+hero::~hero()
+{
+   hasBinoculars_ = false;
+   hasShip_ = false;
+   whiffles_ = 0;
+   energy_ = 0;
+   inventory_.clear();
 }
 
 hero::hero(const  hero & orig)
@@ -33,19 +44,38 @@ vector<tool*> hero::getUsableTools(obstacle current)
     return usableTools_;
 }
 
+void hero::addInventory(tool * toAdd)
+{
+    inventory_.push_back(toAdd);
+}
 
 bool hero::consumeTool(tool * xtool)
 {
-
+    bool success = false;
     for(auto i = inventory_.begin(); i != inventory_.end(); ++i)
+    {
         if(*i == xtool)
         {
             inventory_.erase(i);
-            return true;
+            success = true;
         }
-        else return false;
+    }
+    return success;
 }
 
+int hero::addWhiffles(int value)
+{
+    whiffles_ += value;
+    return whiffles_;
+}
+
+int hero::addEnergy(int value)
+{
+    energy_ += value;
+    return energy_;
+}
+
+//getter functions
 int hero::visionRange(void)
 {
     if(hasBinoculars_) return 2;
@@ -56,3 +86,14 @@ bool hero::hasShip(void)
 {
     return hasShip_;
 }
+
+int hero::whiffles(void)
+{
+    return whiffles_;
+}
+
+int hero::energy(void)
+{
+    return energy_;
+}
+
