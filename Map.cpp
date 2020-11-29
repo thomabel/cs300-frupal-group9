@@ -1,4 +1,8 @@
-#include"Map.h"
+#include "Map.h"
+#include "CsvToOccupant.h"
+
+Tile::Tile() : revealed(false), type(0), occupant(0)
+{}
 
 Map::Map()
 {
@@ -78,6 +82,56 @@ bool Map::loadFile(string src)
 	mvwprintw(win,5 ,5," ");
 	wrefresh(win);
 	*/
+	
+	return true; // placeholder for better things
+}
+
+bool Map::loadOccupants(string src)
+{
+        string temp;
+
+        ifstream fin;
+
+        fin.open(src);
+
+        if (fin)
+        {
+                getline(fin, temp);
+                int qty = stoi(temp);
+                
+                for(int i = 0; i < qty; ++i)
+                {
+			// Discard whitespace line
+                        getline(fin, temp);
+                        
+                        // Read coordinates of tileOccupant
+                        getline(fin, temp, ',');
+                        int row = stoi(temp);
+                        getline(fin, temp);
+                        int col = stoi(temp);
+                        
+                        // Read tileOccupant type string (without trailing
+                        // whitespace)
+                        getline(fin, temp);
+                        string type = temp.erase(
+                                temp.find_last_not_of(" \n\t"));
+                                
+                        // Read tileOccupant data as comma-separated values
+                        getline(fin, temp);
+                        
+                        // Quit and fail if there were issues with the stream
+                        if (!fin)
+                                return false;
+                        
+                        // If the tile already has an occupant, remove it.
+                        if (tileArray[row][col] != 0)
+                        	delete tileArray[row][col];
+                        	
+                        tileArray[row][col].occupant = newOccupant(type, temp);
+                }
+        }
+
+        return true;
 }
 
 bool Map::saveFile(string dest)
