@@ -239,7 +239,7 @@ bool GameState::occupantCheck(char & direction, WINDOW * win)
 		/* End the game if the Hero is out of energy. The user has been
 		 * notified via pop-up already.
 		 */
-		if (theHero.energy < 0)
+		if (theHero.energy <= 0)
 	        {
 			direction = 'q';
 			return false;
