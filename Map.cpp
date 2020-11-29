@@ -77,6 +77,10 @@ bool Map::loadFile(string src)
                 infile.close();
 
         }
+	else
+	{
+		return false;
+	}
 	/*
 	attron(COLOR_PAIR(5));
 	mvwprintw(win,5 ,5," ");
@@ -130,6 +134,10 @@ bool Map::loadOccupants(string src)
                         tileArray[row][col].occupant = newOccupant(type, temp);
                 }
         }
+	else
+	{
+                return false;
+	}
 
         return true;
 }
@@ -154,13 +162,13 @@ bool Map::saveFile(string dest)
 	{
 		for(int j = 0; j<MAPSIZE; ++j)
 		{
-			if(tileArray[i][j] == Meadow)
+			if(tileArray[i][j].type->toString() == "Meadow")
 				outfile<<"G";
-			else if(tileArray[i][j] == Water)
+			else if(tileArray[i][j].type->toString() == "Water")
 				outfile<<"W";
-			else if(tileArray[i][j] == Wall)
+			else if(tileArray[i][j].type->toString() == "Wall")
 				outfile<<"M";
-			else if(tileArray[i][j] == Swamp)
+			else if(tileArray[i][j].type->toString() == "Swamp")
 				outfile<<"S";
 
 		}
@@ -168,6 +176,52 @@ bool Map::saveFile(string dest)
 	}
 	//Close the file
         outfile.close();
+
+	return true;
+}
+
+bool Map::saveOccupants(string dest)
+{
+        ofstream fout;
+
+	// Collect occupants (in order to count) before saving to file.
+	vector<TileOccupant*> occupants;
+	vector<int> rows;
+	vector<int> cols;
+
+	for (int i = 0; i < MAPSIZE; ++i)
+	{
+		for (int j = 0; j < MAPSIZE; ++j)
+		{
+			TileOccupant *occ = tileArray[i][j].occupant;
+			
+			if (occ)
+			{
+                                occupants.push_back(occ);
+				rows.push_back(i);
+				cols.push_back(j);
+			}
+		}
+	
+	}
+
+	outfile.open("CustomOccupants.txt");
+	
+	if (fout)
+	{
+		fout << occupants.size() << "\n";
+
+		for (int i = 0; i < occupants.size(); ++i)
+		{
+			fout << "\n" << rows[i] << "," cols[i] << "\n"
+				<< occupants[i]->typeStr() << "\n"
+				<< occupants[i]->dataAsCsv() << "\n";
+		}
+	}
+        else
+	{
+	        return false;	
+	}
 
 	return true;
 }
