@@ -1,4 +1,4 @@
-#include "csvToOccupant.h"
+#include "CsvToOccupant.h"
 
 TileOccupant *newOccupant(const string &type, const string &csv)
 {
