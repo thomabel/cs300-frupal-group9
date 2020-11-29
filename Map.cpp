@@ -94,9 +94,7 @@ bool Map::loadOccupants(string src)
 {
         string temp;
 
-        ifstream fin;
-
-        fin.open(src);
+        ifstream fin(src);
 
         if (fin)
         {
@@ -182,7 +180,7 @@ bool Map::saveFile(string dest)
 
 bool Map::saveOccupants(string dest)
 {
-        ofstream fout;
+        ofstream fout("CustomOccupants.txt");
 
 	// Collect occupants (in order to count) before saving to file.
 	vector<TileOccupant*> occupants;
@@ -205,8 +203,6 @@ bool Map::saveOccupants(string dest)
 	
 	}
 
-	outfile.open("CustomOccupants.txt");
-	
 	if (fout)
 	{
 		fout << occupants.size() << "\n";
