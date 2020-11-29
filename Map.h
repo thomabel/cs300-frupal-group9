@@ -17,7 +17,7 @@ int MAPSIZE = 128;
 class Map
 {
 	public:
-		Map();
+		Map() = delete;
 		Map(string srcFile);
 		TileType * tileTypeAt(int row, int col);
 		TileOccupant * occupantAt(int row, int col);

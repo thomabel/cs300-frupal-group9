@@ -1,9 +1,5 @@
 #include"Map.h"
 
-Map::Map()
-{
-	//Default Map?
-}
 Map::Map(string srcFile)
 {
 	if(!(loadFile(srcFile)))
@@ -59,7 +55,6 @@ bool Map::loadFile(string src)
 						break;
 				}
 
-
                                 ++j;
 
 				//How should we go about occupants?
@@ -100,13 +95,13 @@ bool Map::saveFile(string dest)
 	{
 		for(int j = 0; j<MAPSIZE; ++j)
 		{
-			if(tileArray[i][j] == Meadow)
+			if(tileArray[i][j].type == Meadow)
 				outfile<<"G";
-			else if(tileArray[i][j] == Water)
+			else if(tileArray[i][j].type == Water)
 				outfile<<"W";
-			else if(tileArray[i][j] == Wall)
+			else if(tileArray[i][j].type == Wall)
 				outfile<<"M";
-			else if(tileArray[i][j] == Swamp)
+			else if(tileArray[i][j].type == Swamp)
 				outfile<<"S";
 
 		}
@@ -146,19 +141,30 @@ bool Map::isTileDiscovered(int row, int col)
 //Display what is discovered
 void Map::displayMap(WINDOW * win)
 {
-
-		//Print the Grovnicks that are used
-		for(int i = MinY; i<MaxY; ++i)
+	char MarkerDisplay;
+	//Print the Grovnicks that are used
+	for(int i = MinY; i<MaxY; ++i)
+	{
+		for(int j = MinX; j<MaxX; ++j)
 		{
-			for(int j = MinX; j<MaxX; ++j)
+			if(tileArray[i][j].revealed)
 			{
-				if(tileArray[i][j].revealed)
+				if(tileArray[i][j].occupant)
+					MarkerDisplay = tileArray[i][j].occupant->marker();
+				else
+					MarkerDisplay = " ";
+
+				if(tileArray[i][j].occupant != NULL && tileArray[i][j].occupant == Diamond)
 				{
-
-					attron(COLOR_PAIR(tileArray[i][j].type->color()));
-					mvwprintw(win,i -MinY ,j-MinX," ");
+					attron(COLOR_PAIR(1));
+					mvwprintw(win,i -MinY ,j-MinX, MarkerDisplay);
 				}
-
+				else
+				{
+					attron(COLOR_PAIR(tileArray[i][j].type->color()));
+					mvwprintw(win,i -MinY ,j-MinX, MarkerDisplay);
+				}
 			}
 		}
+	}
 }

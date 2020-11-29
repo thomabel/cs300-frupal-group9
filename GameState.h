@@ -40,6 +40,7 @@ class GameState
 		bool ccupantCheck(char & direction, WINDOW * win);
 
 		void HeroVision();
+		void HeroVision(int tempHeroY, int tempHeroX);
 	
 	private:
 		Hero theHero;
