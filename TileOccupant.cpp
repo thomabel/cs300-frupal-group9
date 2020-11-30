@@ -68,7 +68,7 @@ Return:		vector<string> - object data to pass to ui
 vector<string> Treasure::getDetails()
 {
 	vector<string> data;
-	data.push_back(" ");
+	data.push_back("");
 	data.push_back(to_string(worth_));
 	data.push_back("Treasure");
 	data.push_back("Worth");
@@ -163,7 +163,7 @@ Return:		vector<string> - object data to pass to ui
 vector<string> Ship::getDetails()
 {
 	vector<string> data;
-	data.push_back(" ");
+	data.push_back("");
 	data.push_back(to_string(whiffleCost_));
 	if(bought_)
 		data.push_back("True");
@@ -323,23 +323,21 @@ vector<string> Tool::getDetails()
 	data.push_back(name_);
 
 	// push all strings from forObstacles
-	obstacleCount = 0;
+	string obstacleList;
 	for (vector<string>::iterator it = forObstacles.begin()
 		; it != forObstacles.end(); ++it)
 	{
-		data.push_back(*it);
-		++obstacleCount;
+		obstacleList = obstacleList + *it;
+		 
 	}
-
+	data.push_back(obstacleList);
 	// push values for cost and rating
 	data.push_back(to_string(whiffleCost_));
 	data.push_back(to_string(rating_));
 	
 	// push labels 
-	for (int i = 0; i < obstacleCount; ++i)
-	{
-		data.push_back("Obstacle");
-	}
+	data.push_back("Tool");
+	data.push_back("Obstacle");
 	data.push_back("Cost");
 	data.push_back("Rating");
 
@@ -582,6 +580,7 @@ Return:		vector<string> - data strings for ui
 vector<string> Binoculars::getDetails()
 {
 	vector<string> data;
+	data.push_back("");
 	data.push_back("Binoculars");
 	
 	return data;
@@ -692,8 +691,10 @@ Return:		vector<string> - data strings for ui
 vector<string> Clue::getDetails()
 {
 	vector<string> data;
+	data.push_back("");
+	data.push_back(msg_);
 	data.push_back("Clue");
-	
+	data.push_back("Message");
 	return data;
 }
 
@@ -776,6 +777,7 @@ vector<string> Diamond::getDetails()
 {
 	vector<string> data;
 
+	data.push_back("");
 	data.push_back("Royal Diamonds");
 
 	return data;
