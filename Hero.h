@@ -5,19 +5,10 @@ November 2020
 #include <vector>
 using namespace std;
 
-
-struct tool{
-    int num = 0;
-};
-
-struct obstacle{
-    int num = 0;
-};
-
-class hero{
+class Hero{
     public:
-    hero();
-    hero(const  hero &);
+    Hero();
+    Hero(const  hero &);
     vector<tool*> getUsableTools(obstacle);
     void addInventory(tool *);
     bool consumeTool(tool *);
@@ -27,6 +18,8 @@ class hero{
     int energy(void) const;
     int addEnergy(int);
     int addWhiffles(int);
+    void giveBinoculars(void);
+    void giveShip(void);
 
     private:
     vector<tool*> inventory_;
