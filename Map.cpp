@@ -4,16 +4,24 @@
 Tile::Tile() : revealed(false), type(0), occupant(0)
 {}
 
-Map::Map(string srcFile)
+Tile::~Tile()
 {
-	if(!(loadFile(srcFile)))
+	if(type)
+		delete type;
+	if(occupant)
+		delete occupant;
+}
+
+Map::Map(string srcFile, int & heroX, int & heroY)
+{
+	if(!(loadFile(srcFile, heroX, heroY)))
 	{
 		cout<<"File cannot open"<<endl;
 	}
 }
 
 //Read in the map
-bool Map::loadFile(string src)
+bool Map::loadFile(string src, int & heroX, int & heroY);
 {
 
         string temp;
@@ -30,7 +38,10 @@ bool Map::loadFile(string src)
          //If file was open sucessfully then eneter
         if(infile)
         {
-
+		infile>>heroX;
+                infile.ignore(100,',');
+                infile>>heroY;
+                infile.ignore(100,'\n');
                 //If end of file is not triggered then enter the loop
                 while(getline(infile,temp))
                 {
@@ -135,7 +146,7 @@ bool Map::loadOccupants(string src)
         return true;
 }
 
-bool Map::saveFile(string dest)
+bool Map::saveFile(string dest, int heroX, int heroY)
 {
 	//Variable: Outfile
 	ofstream outfile;
@@ -148,7 +159,7 @@ bool Map::saveFile(string dest)
 	//Reopen another file
         outfile.open("Custom.txt", ios::app);
 
-
+	outfile<<"Last Position of Hero: "<<heroX<<","<<heroY<<endl;
 	//Loop through list.
 	
 	for(int i=0;i<MAPSIZE;++i)

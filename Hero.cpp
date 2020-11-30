@@ -21,6 +21,7 @@ Hero::Hero(const  Hero & orig){
     this->energy_ = orig.energy_;
 }
 //returns list of tools usable on obstacle
+
 vector<tool*> Hero::getUsableTools(obstacle current){
     vector<tool*> usableTools_;
     for(auto i = inventory_.cbegin(); i != inventory_.cend(); ++i){
@@ -37,6 +38,7 @@ void Hero::addInventory(tool * toAdd){
 }
 
 bool Hero::consumeTool(tool * xtool){
+
     bool success = false;
     for(auto i = inventory_.begin(); i != inventory_.end(); ++i){
         if(*i == xtool){

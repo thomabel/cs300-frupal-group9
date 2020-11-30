@@ -1,3 +1,6 @@
+#ifndef CsvToOccupant_CLASS
+#define CsvToOccupant_CLASS
+
 #include <sstream>
 #include <string>
 
@@ -26,3 +29,5 @@ TileOccupant *csvToDiamond(const string &csv);
 TileOccupant *csvToObstacle(const string &csv);
 
 TileOccupant *csvToTool(const string &csv);
+
+#endif
