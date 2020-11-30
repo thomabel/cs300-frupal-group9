@@ -57,6 +57,14 @@ int hero::addEnergy(int value){
     return energy_;
 }
 
+void hero::giveBinoculars(void){
+    hasBinoculars_ = true;
+}
+
+void hero::giveShip(void) {
+    hasShip_ = true;
+}
+
 //getter functions
 int hero::visionRange(void) const{
     if(hasBinoculars_) return 2;

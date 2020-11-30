@@ -153,7 +153,7 @@ int main()
 	int border =0;
 
 	//The right side border of the screen
-	if(COLS > 128)
+	if(COLS > 170)
 		border = 128;
 	else
 		border = COLS - COLS/4;
@@ -202,6 +202,7 @@ int main()
 	// For the actual game
 
 	/*
+	init_pair(1, COLOR_WHITE, COLOR_CYAN);
 	init_pair(2, COLOR_BLACK, COLOR_GREEN);
 	init_pair(3, COLOR_BLACK, COLOR_BLACK);
 	init_pair(4, COLOR_WHITE, COLOR_BLUE);
@@ -237,6 +238,7 @@ int main()
 	int heroX = cursorX;
 	int heroY = cursorY;
 
+
 	WINDOW * win;
 	win = newwin(LINES, COLS-border, 0, border);
 	refresh();
@@ -267,28 +269,28 @@ int main()
 			switch(i)
 			{
 				case 1:
-					if(heroY-1 >= -1)
+					if(heroY-1 > -1)
 						--heroY;
 					else
 						heroY = 0;
 					break;
 
 				case 2:
-					if(heroY+1 < LINES+1)
+					if(heroY+1 < LINES)
                                                 ++heroY;
                                         else
                                                 heroY = LINES-1;
                                         break;
 
 				case 3:
-					if(heroX+1 < border+1)
+					if(heroX+1 < border)
                                                 ++heroX;
                                         else
                                                 heroX = border-1;
 
                                         break;
 				case 4:
-					if(heroX-1 >= -1)
+					if(heroX-1 > -1)
                                                 --heroX;
                                         else
                                                 heroX = 0;
@@ -411,8 +413,10 @@ int main()
                 }
 		*/
 
+
+		
 		//Explore down the map
-		if(heroY == LINES)
+		if(heroY == LINES - 5 && MaxY != 128)
 		{
 			--heroY;
 
@@ -437,7 +441,7 @@ int main()
 
 		}
 		//Go back up 
-		else if(heroY == -1)
+		else if(heroY == 5 && MinY != 0)
 		{
 			++heroY;
 			temp = heroY + MinY;
@@ -460,7 +464,7 @@ int main()
 		}
 		
 		//Explore right
-		else if(heroX == border)
+		else if(heroX == border -5 && MaxX != 128)
 		{
 			--heroX;
 
@@ -485,7 +489,7 @@ int main()
 		}
 
 		//explore left
-		else if(heroX == -1)
+		else if(heroX == 5 && MinX !=0)
 		{
 			++heroX;
 
@@ -517,6 +521,7 @@ int main()
 
 			//array[heroY+FrupalY][heroX+FrupalX].used = true;
 		}
+
 		/*
 		for(int i = MinY; i<MaxY; ++i)
                 {
@@ -539,6 +544,39 @@ int main()
 
                         }
                 }
+		/*
+		int tempY = heroY;
+		int tempX = heroX;
+		for(int i = 0; i< 5; ++i)
+		{
+			if( i == 0)
+                        {
+				heroY = tempY - 1;
+				heroX = tempX - 1;
+                        }
+
+			if( i == 1)
+			{
+				heroY = tempY - 1;
+                                heroX = tempX + 1;
+			}
+			if(i == 2)
+			{
+				heroY = tempY + 1;
+				heroX = tempX - 1;
+
+			}
+			if( i == 3)
+                        {
+				heroY = tempY + 1;
+				heroX = tempX + 1;
+                        }
+			if( i == 4)
+                        {
+                                heroY = tempY;
+                                heroX = tempX;
+                        }
+			*/
 
 
 		if((heroY < LINES && heroY >= 0) && (heroX < border && heroX >= 0))
@@ -548,7 +586,7 @@ int main()
 			int checkI = heroY;
 			int i = heroY;
 			int j = heroX;
-			for(int l = 1; l< 3; l++)
+			for(int l = 1; l< 2; l++)
 			{
 				for(int k = 0; k<8;k++)
 				{
@@ -591,6 +629,9 @@ int main()
 				}
 			}
 		}
+		//}
+		//heroY = tempY;
+                //heroX = tempX;
 		//Print the Grovnicks that are used
 		for(int i = MinY; i<MaxY; ++i)
 		{
