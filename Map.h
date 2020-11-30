@@ -50,6 +50,7 @@ class Map
 		Map(string srcFile, int & heroX, int & heroY);
 		TileType * tileTypeAt(int row, int col);
 		TileOccupant * occupantAt(int row, int col);
+        void setOccupantAt(int row, int col, TileOccupant* newOccupant);
 
 		void tile_revealed(int row, int col);
 

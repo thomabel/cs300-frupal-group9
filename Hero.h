@@ -15,23 +15,23 @@ using namespace std;
 
 class Hero{
     public:
-  
       Hero();
       Hero(const  hero &);
-      vector<tool*> getUsableTools(obstacle);
-      void addInventory(tool *);
-      bool consumeTool(tool *);
+      vector<Tool*> getUsableTools(Obstacle&);
+      vector<vector<string>> getToolOptions(Obstacle&);
+      void addInventory(Tool *);
+      bool consumeTool(Tool *);
       int visionRange(void) const;
       bool hasShip(void) const;
       int whiffles(void) const;
       int energy(void) const;
       int addEnergy(int);
       int addWhiffles(int);
-      void giveBinoculars(void);
-      void giveShip(void);
+      void setHasBinoculars(bool);
+      void setHasShip(bool);
 
     private:
-      vector<tool*> inventory_;
+      vector<Tool*> inventory_;
       bool hasBinoculars_;
       bool hasShip_;
       int whiffles_;
