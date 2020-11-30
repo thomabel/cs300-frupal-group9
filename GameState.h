@@ -1,6 +1,14 @@
+/*
+ GameState Class
+ Author: Mohamed-Amin Cheaito
+ November 2020
+*/
+#ifndef GameState_CLASS
+#define GameState_CLASS
 
 #include"Map.h"
-
+#include"Hero.h"
+#include"UI.h"
 //Screen size
 int MaxScreenX = 0; //COLS
 
@@ -20,27 +28,21 @@ class GameState
 {
 	public:
 		
-		GameState(string MapsrcFile);
+		GameState();
 		
-		//Do we Need this??
-		/*
-		int getHeroRow();
-		int getHeroCol();
-		bool moveHeroTo( int row, int col);
-		*/
-		void travel(char & direction, WINDOW * win, WINDOW * menu);
+		void travel(int & direction, WINDOW * win);
 
+		void cursorTravel(int direction);
 
-		void cursorTravel(char direction);
-
-		bool HeroTravel(char & direction, WINDOW * menu);
+		bool HeroTravel(int & direction);
 
 		bool ExpandMap();
 
-		bool ccupantCheck(char & direction, WINDOW * win);
+		bool occupantCheck(int & direction);
 
 		void HeroVision();
 		void HeroVision(int tempHeroY, int tempHeroX);
+		void RunGame(WINDOW * win);
 	
 	private:
 		Hero theHero;
@@ -51,3 +53,4 @@ class GameState
 		int heroX;
 		int heroY;
 };
+#endif

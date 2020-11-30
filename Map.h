@@ -1,3 +1,9 @@
+/*
+ Map Class
+ Author: Mohamed-Amin Cheaito
+ November 2020
+*/
+/*
 #include<ncurses.h>
 #include<vector>
 #include<cstring>
@@ -7,18 +13,32 @@
 #include<fstream>
 #include<iostream>
 using namespace std;
-/*
-#include "Tile.h"
+*/
+
+#ifndef Map_CLASS
+#define Map_CLASS
+
 #include "TileType.h"
 #include"TileOccupant.h"
-*/
-int MAPSIZE = 128;
+
+
+const int MAPSIZE = 128;
+
+struct Tile
+{
+	Tile();
+	~Tile();
+
+	bool revealed;
+	TileType* type;
+	TileOccupant* occupant;
+};
 
 class Map
 {
 	public:
 		Map() = delete;
-		Map(string srcFile);
+		Map(string srcFile, int & heroX, int & heroY);
 		TileType * tileTypeAt(int row, int col);
 		TileOccupant * occupantAt(int row, int col);
 
@@ -29,12 +49,15 @@ class Map
 		void displayMap(WINDOW * win);
 
 
-		bool loadFile(string src);
+		bool loadFile(string src, int & heroX, int & heroY);
+		bool loadOccupants(string src);
 
 		//Write to a file
 		bool saveFile(string dest);
+		bool saveOccupants(string dest);
 
 	private:
 		//vector<vector<Tile>> tileArray;
-		Tile tileArray[128][128];
+		Tile tileArray[MAPSIZE][MAPSIZE];
 };
+#endif

@@ -1,10 +1,11 @@
 #include"GameState.h"
 
-GameState::GameState(string MapsrcFile):map(MapsrcFile)
+GameState::GameState(): map("Frupal.txt", heroX, heroY)
 {
+	//string MapsrcFile = "Frupal.txt";
 	//Where should the player start?
-	heroX =0;
-        heroY =0;
+	//heroX =0;
+        //heroY =0;
 	
 	//Should start at Hero position
 	cursorX = heroX;
@@ -12,12 +13,12 @@ GameState::GameState(string MapsrcFile):map(MapsrcFile)
 }
 
 //Main travel function
-void GameState::travel(char & direction, WINDOW * win, WINDOW * menu)
+void GameState::travel(int & direction, WINDOW * win)
 {
 	//Only Time this doesn't enter is when we 
 	//move the cursor or exit the program due to not having
 	//enough energy (Should Also not enter when Diamond is found)
-	if(HeroTravel(direction, menu))
+	if(HeroTravel(direction))
 	{
 
 		//Enter if want to continue to explore the map
@@ -41,7 +42,7 @@ void GameState::travel(char & direction, WINDOW * win, WINDOW * menu)
 		
 		map.displayMap(win);
 
-		UI.WhiffEn(theHero.whiffles(), theHero.energy());
+		UI.whifflesEnergy(theHero.whiffles(), theHero.energy());
 
 		wattron(win,COLOR_PAIR(6));
 		mvwprintw(win,heroY, heroX, "@");
@@ -54,7 +55,7 @@ void GameState::travel(char & direction, WINDOW * win, WINDOW * menu)
 }
 
 //The hero traveling 
-bool GameState::HeroTravel(char & direction, WINDOW * menu)
+bool GameState::HeroTravel(int & direction)
 {
 	TileType * temp_type = NULL;
 
@@ -73,10 +74,10 @@ bool GameState::HeroTravel(char & direction, WINDOW * menu)
 					--heroY;
 					temp_type = map.tileTypeAt(heroX+MinX, heroY+MinY);
 					//Check if we can enter
-					if(temp_type->CanEnter(theHero))
+					if(temp_type->canEnter(theHero))
 					{
 						//Make sure take away the energy needed to get here
-						temp_type->energyCost(theHero);
+						theHero.addEnergy((temp_type->energyCost() * -1 ));
 						//Make sure we still have enough energy
 						if(theHero.energy() <= 0)
 						{
@@ -85,7 +86,7 @@ bool GameState::HeroTravel(char & direction, WINDOW * menu)
 							return false;
 						}
 						//Check our occupant
-						return occupantCheck(direction,menu);
+						return occupantCheck(direction);
 					}
 					else
 					{
@@ -108,15 +109,15 @@ bool GameState::HeroTravel(char & direction, WINDOW * menu)
 					//Same as above but move down
 					++heroY;
 					temp_type = map.tileTypeAt(heroX+MinX, heroY+MinY);
-					if(temp_type->CanEnter(theHero))
+					if(temp_type->canEnter(theHero))
 					{
-						temp_type->energyCost(theHero);
+						theHero.addEnergy((temp_type->energyCost() * -1 ));
 						if(theHero.energy() <= 0)
                                                 {
                                                         direction = 'q';
                                                         return false;
                                                 }
-						return occupantCheck(direction,menu);
+						return occupantCheck(direction);
 
 					}
 					else
@@ -141,15 +142,15 @@ bool GameState::HeroTravel(char & direction, WINDOW * menu)
 					//Move right
                                         ++heroX;
                                         temp_type = map.tileTypeAt(heroX+MinX, heroY+MinY);
-                                        if(temp_type->CanEnter(theHero))
+                                        if(temp_type->canEnter(theHero))
 					{
-                                                temp_type->energyCost(theHero);
+						theHero.addEnergy((temp_type->energyCost() * -1 ));
 						if(theHero.energy() <= 0)
                                                 {
                                                         direction = 'q';
                                                         return false;
                                                 }
-						return occupantCheck(direction,menu);
+						return occupantCheck(direction);
 
 
 					}
@@ -175,15 +176,15 @@ bool GameState::HeroTravel(char & direction, WINDOW * menu)
 					//Move left
                                         --heroX;
                                         temp_type = map.tileTypeAt(heroX+MinX, heroY+MinY);
-                                        if(temp_type->CanEnter(theHero))
+                                        if(temp_type->canEnter(theHero))
 					{
-                                                temp_type->energyCost(theHero);
+						theHero.addEnergy((temp_type->energyCost() * -1 ));
 						if(theHero.energy() <= 0)
                                                 {
                                                         direction = 'q';
                                                         return false;
                                                 }
-						return occupantCheck(direction,menu);
+						return occupantCheck(direction);
 
 					}
                                         else
@@ -207,59 +208,55 @@ bool GameState::HeroTravel(char & direction, WINDOW * menu)
 
 }
 //What occupies the tile
-bool GameState::occupantCheck(char & direction, WINDOW * win)
+bool GameState::occupantCheck(int & direction)
 {
 	TileOccupant * occupant_temp = map.occupantAt(heroX+MinX, heroY+MinY);
-	TileType * temp_type = map.tileTypeAt(heroX+MinX, heroY+MinY);
-	vector <string> details;
-
 
 	//Not NULL, we have an occupant
 	if(occupant_temp)
 	{
-		//Only time we exit is when we can't destory an obstacle so if we don't have enough
-		//energy the exit program
-		if(occupant_temp == Obstacle && (occupant_temp->energyCost() > theHero.energy() ) )
+		string popupMsg = occupant_temp->promptMsg();
+
+		vector<string> details = occupant_temp->getDetails();
+
+		char response = 0;
+
+		/* Give the user the appropriate pop-up for the encounter.
+		 * TileOccupant::promptMsg() will give an appropriate message if
+		 * the user cannot afford an item.
+		 */
+		if (occupant_temp->typeStr() == "Obstacle")
+		{
+			response = UI.popup(popupMsg, details, 
+			theHero.getUsableTools(occupant_temp));
+		}
+		else
+		{
+			response = UI.popup(popupMsg, details);
+		}
+		
+		occupant_temp->interact(response, theHero);
+
+		/* End the game if the Hero is out of energy. The user has been
+		 * notified via pop-up already.
+		 */
+		if (theHero.energy() <= 0)
 		{
 			direction = 'q';
 			return false;
 		}
 
-		//Make sure we have enough money if we don't, the don't show the user until they have enough
-		else if(occupant_temp != Clue && occupant_temp != Treasure && occupant_temp != Diamond){
-			if(occupant_temp->whiffleCost() > theHero.whiffles()){
-				mvwprintw(win, 0, (MaxScreenX - MenuBorder)/2, "Not Enough Money for Occupant");
-				wrefresh(win);
-				return true;
-			}
-		}
-
-		details = occupant_temp.getdetails();
-		int i = details.size()/2;
-		details.insert(details.begin(),temp_type.toString());
-		details.insert(details.begin() + i, "Grovnick");
-
-		if(occupant_temp == Obstacle)
+		/* End the game if the Hero found a diamond. The user has been
+		 * notified via pop-up already.
+		 */
+		if (occupant_temp->typeStr() == "Diamond")
 		{
-			UI.popup(occupant_temp->promptMsg(theHero), details, occupant_temp->usableTools(theHero));
-
+			direction = 'w'; // 'w' for "win"? Or is that what "return true" is for?
+			return false;
 		}
-		else
-		{
-			UI.popup(occupant_temp->promptMsg(theHero), details);
-		}
-
-
-
-
-		//Pass in what the pop up passes back which returns if we interacted or not and pass the hero
-		//by reference so we can make changes.
-
-		//occupant_temp->interact((UI.popup(occupant_temp->getdetails())), theHero);
 
 	}
 	return true;
-
 }
 
 
@@ -337,7 +334,7 @@ void GameState::HeroVision( int tempHeroY, int tempHeroX)
 	}
 }
 //Inspect tiles with cursor
-void GameState::cursorTravel(char direction)
+void GameState::cursorTravel(int direction)
 {
 	TileType * temp_type = NULL;
         TileOccupant * occupant_temp = NULL;
@@ -384,17 +381,17 @@ void GameState::cursorTravel(char direction)
 	}
 	//Pass in tileType and Occupant to inspect 
 
-	if(isTileDiscovered(cursorX+MinX, cursorY+MinY)){ 
+	if(map.isTileDiscovered(cursorX+MinX, cursorY+MinY)){ 
 		temp_type= map.tileTypeAt(cursorX+MinX, cursorY+MinY);
 		occupant_temp = map.occupantAt(cursorX+MinX, cursorY+MinY);
 
 		if(occupant_temp){
-			details = occupant_temp->getdetails();
+			details = occupant_temp->getDetails();
 		//	if(details.size() % 2 == 0)
 		//	{
 		//	I think that details should give an even vector.
 			int i = details.size()/2;
-			temp = temp_type.toString();
+			temp = temp_type->toString();
 			details.insert(details.begin(),temp);
 			details.insert(details.begin() + i, "Grovnick");
 			UI.tileInspect(details);
@@ -404,7 +401,7 @@ void GameState::cursorTravel(char direction)
 
 		}
 		else{
-			temp = temp_type.toString();
+			temp = temp_type->toString();
 			details.push_back(temp);
 			details.push_back("Grovnick");
 			UI.tileInspect(details);
@@ -522,4 +519,14 @@ bool GameState::ExpandMap()
 
 	}
 	return false;
+}
+
+void GameState::RunGame(WINDOW * win)
+{
+	int choice = 'a';
+	while(choice != 'q')
+	{
+		choice = wgetch(stdscr);
+		travel(choice,win);
+	}
 }

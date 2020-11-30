@@ -1,0 +1,33 @@
+8 //Number of TileOccupants in this file
+//Extra line before each TileOccupant for readability
+0,0
+Food
+croissant,12,1
+
+1,1
+Binoculars
+3
+
+2,2
+Ship
+30
+
+6,6
+Treasure
+1000
+
+1,9
+Clue
+You are 20 grovnicks from the western border, there is a swamp 30 grovniks to the north, and the royal diamonds are located 40 grovnicks to the east and 50 grovnicks to the South.
+
+8,8
+Diamond
+//Diamond has no data and this line is discarded. Include it nevertheless.
+
+9,9
+Obstacle
+boulder,60
+
+14,12
+Tool
+bazooka,100,30,2,boulder,fence
