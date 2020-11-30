@@ -7,8 +7,8 @@ using namespace std;
 
 class Hero{
     public:
-    hero();
-    hero(const  hero &);
+    Hero();
+    Hero(const  hero &);
     vector<tool*> getUsableTools(obstacle);
     void addInventory(tool *);
     bool consumeTool(tool *);
