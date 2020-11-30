@@ -8,11 +8,19 @@
 #include<iostream>
 using namespace std;
 /*
-#include "Tile.h"
 #include "TileType.h"
 #include"TileOccupant.h"
 */
 int MAPSIZE = 128;
+
+struct Tile
+{
+	Tile();
+
+	bool revealed;
+	TileType* type;
+	TileOccupant* occupant;
+};
 
 class Map
 {
@@ -30,9 +38,11 @@ class Map
 
 
 		bool loadFile(string src);
+		bool loadOccupants(string src);
 
 		//Write to a file
 		bool saveFile(string dest);
+		bool saveOccupants(string dest);
 
 	private:
 		//vector<vector<Tile>> tileArray;

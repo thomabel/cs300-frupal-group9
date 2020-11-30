@@ -210,56 +210,52 @@ bool GameState::HeroTravel(char & direction, WINDOW * menu)
 bool GameState::occupantCheck(char & direction, WINDOW * win)
 {
 	TileOccupant * occupant_temp = map.occupantAt(heroX+MinX, heroY+MinY);
-	TileType * temp_type = map.tileTypeAt(heroX+MinX, heroY+MinY);
-	vector <string> details;
-
 
 	//Not NULL, we have an occupant
 	if(occupant_temp)
 	{
-		//Only time we exit is when we can't destory an obstacle so if we don't have enough
-		//energy the exit program
-		if(occupant_temp == Obstacle && (occupant_temp->energyCost() > theHero.energy() ) )
+    string popupMsg = occupant_temp->promptMsg();
+
+		vector<string> details = occupant_temp->getDetails();
+
+		char response = 0;
+
+		/* Give the user the appropriate pop-up for the encounter.
+		 * TileOccupant::promptMsg() will give an appropriate message if
+		 * the user cannot afford an item.
+		 */
+		if (occupant_temp->typeStr() == "Obstacle")
 		{
+              response = UI.popup(popupMsg, details, 
+			        theHero.getUsableTools());
+		}
+		else
+		{
+			response = UI.popup(popupMsg, details);
+		}
+
+    occupant_temp->interact(response, theHero);
+
+		/* End the game if the Hero is out of energy. The user has been
+		 * notified via pop-up already.
+		 */
+		if (theHero.energy <= 0)
+	  {
 			direction = 'q';
 			return false;
 		}
 
-		//Make sure we have enough money if we don't, the don't show the user until they have enough
-		else if(occupant_temp != Clue && occupant_temp != Treasure && occupant_temp != Diamond){
-			if(occupant_temp->whiffleCost() > theHero.whiffles()){
-				mvwprintw(win, 0, (MaxScreenX - MenuBorder)/2, "Not Enough Money for Occupant");
-				wrefresh(win);
-				return true;
-			}
-		}
-
-		details = occupant_temp.getdetails();
-		int i = details.size()/2;
-		details.insert(details.begin(),temp_type.toString());
-		details.insert(details.begin() + i, "Grovnick");
-
-		if(occupant_temp == Obstacle)
+		/* End the game if the Hero found a diamond. The user has been
+		 * notified via pop-up already.
+		 */
+		if (occupant_temp->typeStr() == "Diamond")
 		{
-			UI.popup(occupant_temp->promptMsg(theHero), details, occupant_temp->usableTools(theHero));
-
+			direction = 'w'; // 'w' for "win"? Or is that what "return true" is for?
+			return false;
 		}
-		else
-		{
-			UI.popup(occupant_temp->promptMsg(theHero), details);
-		}
-
-
-
-
-		//Pass in what the pop up passes back which returns if we interacted or not and pass the hero
-		//by reference so we can make changes.
-
-		//occupant_temp->interact((UI.popup(occupant_temp->getdetails())), theHero);
 
 	}
 	return true;
-
 }
 
 

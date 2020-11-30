@@ -27,6 +27,8 @@ class hero{
     int energy(void) const;
     int addEnergy(int);
     int addWhiffles(int);
+    void giveBinoculars(void);
+    void giveShip(void);
 
     private:
     vector<tool*> inventory_;
