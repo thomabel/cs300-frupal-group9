@@ -5,16 +5,7 @@ November 2020
 #include <vector>
 using namespace std;
 
-
-struct tool{
-    int num = 0;
-};
-
-struct obstacle{
-    int num = 0;
-};
-
-class hero{
+class Hero{
     public:
     hero();
     hero(const  hero &);
