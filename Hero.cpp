@@ -23,10 +23,9 @@ Hero::Hero(const  Hero & orig){
 vector<tool*> Hero::getUsableTools(obstacle current){
     vector<tool*> usableTools_;
     for(auto i = inventory_.cbegin(); i != inventory_.cend(); ++i){
-        // if(i->usableOn(current))
-        // {
+        if(i->usableOn(current)){
         usableTools_.push_back(*i);
-        // }
+        }
     }
 
     return usableTools_;
