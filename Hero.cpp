@@ -75,11 +75,11 @@ bool Hero::hasShip(void) const{
     return hasShip_;
 }
 
-int hero::whiffles(void) const{
+int Hero::whiffles(void) const{
     return whiffles_;
 }
 
-int hero::energy(void) const{
+int Hero::energy(void) const{
     return energy_;
 }
 
