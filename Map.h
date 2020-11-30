@@ -34,6 +34,15 @@ struct Tile
 	TileOccupant* occupant;
 };
 
+struct Tile
+{
+	Tile();
+
+	bool revealed;
+	TileType* type;
+	TileOccupant* occupant;
+};
+
 class Map
 {
 	public:
@@ -47,7 +56,6 @@ class Map
 		bool isTileDiscovered(int row, int col);
 
 		void displayMap(WINDOW * win);
-
 
 		bool loadFile(string src, int & heroX, int & heroY);
 		bool loadOccupants(string src);

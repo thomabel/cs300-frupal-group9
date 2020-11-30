@@ -21,22 +21,24 @@ Hero::Hero(const  Hero & orig){
     this->energy_ = orig.energy_;
 }
 //returns list of tools usable on obstacle
-vector<Tool*> Hero::getUsableTools( TileOccupant * current){
-    vector<Tool*> usableTools_;
+
+vector<tool*> Hero::getUsableTools(obstacle current){
+    vector<tool*> usableTools_;
     for(auto i = inventory_.cbegin(); i != inventory_.cend(); ++i){
         if(i->usableOn(current)){
-		usableTools_.push_back(*i);
+        usableTools_.push_back(*i);
         }
     }
 
     return usableTools_;
 }
 
-void Hero::addInventory(Tool * toAdd){
+void Hero::addInventory(tool * toAdd){
     inventory_.push_back(toAdd);
 }
 
-bool Hero::consumeTool(Tool * xtool){
+bool Hero::consumeTool(tool * xtool){
+
     bool success = false;
     for(auto i = inventory_.begin(); i != inventory_.end(); ++i){
         if(*i == xtool){

@@ -43,4 +43,5 @@ class Water : public TileType
     int color() const override;
     std::string toString() const override;
 };
+
 #endif
