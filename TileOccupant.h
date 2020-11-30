@@ -6,9 +6,12 @@ Description:
 		TileOccupant and derived classes header file
 */
 
-#include <ncurses.h>
+#ifndef TileOccupant_CLASS
+#define TileOccupant_CLASS
+
+#include<ncurses.h>
+#include<vector>
 #include <string>
-#include <vector>
 #include <stdexcept>
 #include "Hero.h"
 
@@ -34,7 +37,6 @@ class TileOccupant
         virtual string dataAsCsv() const =0;
 	protected:
 };
-
 
 
 class Treasure: public TileOccupant
@@ -148,7 +150,7 @@ class Diamond: public TileOccupant
 	protected:
 };
 
-class Obstacle
+class Obstacle : public TileOccupant
 {
 public:
     Obstacle() = delete;
@@ -167,7 +169,7 @@ private:
     int energyCost_;
 };
 
-class Binoculars
+class Binoculars : public TileOccupant
 {
 public:
     Binoculars() = delete;

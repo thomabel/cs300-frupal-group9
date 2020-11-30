@@ -117,7 +117,7 @@ Return:		vector<string> - object data to pass to ui
 vector<string> Treasure::getDetails()
 {
 	vector<string> data;
-	data.push_back(" ");
+	data.push_back("");
 	data.push_back(to_string(worth_));
 	data.push_back("Treasure");
 	data.push_back("Worth");
@@ -224,7 +224,7 @@ Return:		vector<string> - object data to pass to ui
 vector<string> Ship::getDetails()
 {
 	vector<string> data;
-	data.push_back(" ");
+	data.push_back("");
 	data.push_back(to_string(whiffleCost_));
 	if(bought_)
 		data.push_back("True");
@@ -409,23 +409,21 @@ vector<string> Tool::getDetails()
 	data.push_back(name_);
 
 	// push all strings from forObstacles
-	obstacleCount = 0;
+	string obstacleList;
 	for (vector<string>::iterator it = forObstacles.begin()
 		; it != forObstacles.end(); ++it)
 	{
-		data.push_back(*it);
-		++obstacleCount;
+		obstacleList = obstacleList + *it;
+		 
 	}
-
+	data.push_back(obstacleList);
 	// push values for cost and rating
 	data.push_back(to_string(whiffleCost_));
 	data.push_back(to_string(rating_));
 	
 	// push labels 
-	for (int i = 0; i < obstacleCount; ++i)
-	{
-		data.push_back("Obstacle");
-	}
+	data.push_back("Tool");
+	data.push_back("Obstacle");
 	data.push_back("Cost");
 	data.push_back("Rating");
 
@@ -479,8 +477,8 @@ bool Tool::interact(char promptResponse, Hero& theHero)
 	if(theHero.whiffles() < whiffleCost_)
 		return true;
 	
-    if (!TileOccupant::interact(promptResponse, theHero))
-        return false;
+  if (!TileOccupant::interact(promptResponse, theHero))
+    return false;
 
 	switch(promptResponse)
 	{
@@ -710,14 +708,14 @@ Return:		vector<string> - data strings for ui
 */
 std::vector<std::string> Binoculars::getDetails() override
 {
-    std::vector<std::string> details;
-
-    details.push_back("Binoculars");
-    details.push_back(std::to_string(whiffleCost_));
-    details.push_back("");
-    details.push_back("Price");
-
-    return details;
+	vector<string> data;
+  
+	data.push_back("");
+  details.push_back(std::to_string(whiffleCost_));
+	data.push_back("Binoculars");
+  details.push_back("Price");
+	
+	return data;
 }
 
 /*
@@ -841,8 +839,10 @@ Return:		vector<string> - data strings for ui
 vector<string> Clue::getDetails()
 {
 	vector<string> data;
+	data.push_back("");
+	data.push_back(msg_);
 	data.push_back("Clue");
-	
+	data.push_back("Message");
 	return data;
 }
 
@@ -935,6 +935,7 @@ vector<string> Diamond::getDetails()
 {
 	vector<string> data;
 
+	data.push_back("");
 	data.push_back("Royal Diamonds");
 
 	return data;
@@ -1071,59 +1072,3 @@ string Obstacle::dataAsCsv() const
 {
     return name_ + "," + to_string(energyCost_);
 }
-
-/*
-/////////////////////////////////////////////////////////////////
-Binoculars class derived from TileOccupant
-/////////////////////////////////////////////////////////////////
-
-Binoculars::Binoculars(int whiffleCost) : whiffleCost_(whiffleCost), 
-    consumed_(false);
-{}
-
-std::string Binoculars::promptMsg(Hero& theHero) override
-{
-    if (theHero.whiffles() < whiffleCost_)
-    {
-        return std::string("You cannot afford these binoculars.")
-    }
-    else
-    {
-        // Price not listed because item details are also included in the 
-        // popup.
-        return std::string("Would you like to buy these binoculars? Press Y"
-            + " to purchase or any other key to not.");
-    }
-}
-
-// Gives the Hero binoculars if the user chooses to purchase.
-void Binoculars::interact(char promptResponse, Hero& theHero) override
-{
-    if (theHero.whiffles() < whiffleCost_)
-    {
-        // Regardless of the response, these binoculars were not purchased.
-        return;
-    }
-
-    if (promptResponse == 'y' || promptResponse == 'Y')
-    {
-        theHero.setHasBinoculars(true);
-        theHero.addWhiffles(-whiffleCost_);
-    }
-}
-
-bool Binoculars::permanent() override
-{
-    return !consumed_;
-}
-
-int Binoculars::color() override
-{
-    return COLOR_BLACK;
-}
-
-char Binoculars::marker() override
-{
-    return 'B';
-}
-*/

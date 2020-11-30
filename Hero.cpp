@@ -20,9 +20,11 @@ Hero::Hero(const  Hero & orig){
     this->whiffles_ = orig.whiffles_;
     this->energy_ = orig.energy_;
 }
+
 //returns list of tools usable on Obstacle
 vector<Tool*> Hero::getUsableTools(Obstacle &current){
     vector<Tool*> usableTools_;
+ 
     for(auto i = inventory_.cbegin(); i != inventory_.cend(); ++i){
         if(i->usableOn(current)){
         usableTools_.push_back(*i);
@@ -32,7 +34,7 @@ vector<Tool*> Hero::getUsableTools(Obstacle &current){
     return usableTools_;
 }
 
-vector<vector<string>> getToolOptions(Obstacle &current) {
+vector<vector<string>> Hero::getToolOptions(Obstacle &current) {
     vector<Tool*> tools = getUsableTools(current);
     vector<vector<string>> options;
 

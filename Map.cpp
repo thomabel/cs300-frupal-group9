@@ -1,29 +1,86 @@
 #include "Map.h"
 #include "CsvToOccupant.h"
 
-Tile::Tile() : revealed(false), type(0), occupant(0) {}
+Tile::Tile() : revealed(false), type(0), occupant(0)
+{}
 
-Map::Map(string srcFile) {
-  if (!(loadFile(srcFile))) {
-    cout << "File cannot open" << endl;
-  }
+Tile::~Tile()
+{
+	if(type)
+		delete type;
+	if(occupant)
+		delete occupant;
 }
 
-// Read in the map
-bool Map::loadFile(string src) {
+Map::Map(string srcFile, int & heroX, int & heroY)
+{
+	if(!(loadFile(srcFile, heroX, heroY)))
+	{
+		cout<<"File cannot open"<<endl;
+	}
+}
 
-  string temp;
-  int i = 0;
-  int j = 0;
+//Read in the map
+bool Map::loadFile(string src, int & heroX, int & heroY);
+{
 
-  // if(read_file==0)
-  ifstream infile;
-  // Open the designated file
-  // infile.open("practice.txt");
-  infile.open(src);
+        string temp;
+        int i = 0;
+        int j = 0;
 
-  // If file was open sucessfully then eneter
-  if (infile) {
+        //if(read_file==0)
+        ifstream infile;
+        //Open the designated file
+        //infile.open("practice.txt");
+	infile.open(src);
+	
+	
+         //If file was open sucessfully then eneter
+        if(infile)
+        {
+		infile>>heroX;
+                infile.ignore(100,',');
+                infile>>heroY;
+                infile.ignore(100,'\n');
+                //If end of file is not triggered then enter the loop
+                while(getline(infile,temp))
+                {
+                        for(unsigned int k = 0;k<temp.size();++k)
+                        {
+
+                                if(j == MAPSIZE)
+                                {
+                                        ++i;
+                                        j=0;
+                                }
+
+				switch(temp[k])
+				{               
+					case 'W':
+						tileArray[i][j].type = new Water;//Color num 4
+						break;
+					case 'M':
+						tileArray[i][j].type = new Wall;//Color num 7
+						break;
+					case 'S':
+						tileArray[i][j].type = new Swamp; //Color num 5
+						break;
+					case 'G':
+						tileArray[i][j].type = new Meadow; //Color num 2
+						break;
+				}
+
+                                ++j;
+
+				//How should we go about occupants?
+
+                        }
+
+
+
+
+                }
+                infile.close();
 
     // If end of file is not triggered then enter the loop
     while (getline(infile, temp)) {
@@ -110,40 +167,43 @@ bool Map::loadOccupants(string src) {
   }
 
   return true;
-}
 
-bool Map::saveFile(string dest) {
-  // Variable: Outfile
-  ofstream outfile;
-  // Open the data.txt files
-  outfile.open("Custom.txt");
-  // Clear what was in function
-  outfile.clear();
-  // Close the file
-  outfile.close();
-  // Reopen another file
-  outfile.open("Custom.txt", ios::app);
+bool Map::saveFile(string dest, int heroX, int heroY)
+{
+	//Variable: Outfile
+	ofstream outfile;
+	//Open the data.txt files
+        outfile.open("Custom.txt");
+	//Clear what was in function
+        outfile.clear();
+	//Close the file
+	outfile.close();
+	//Reopen another file
+        outfile.open("Custom.txt", ios::app);
 
-  // Loop through list.
+	outfile<<"Last Position of Hero: "<<heroX<<","<<heroY<<endl;
+	//Loop through list.
+	
+	for(int i=0;i<MAPSIZE;++i)
+	{
+		for(int j = 0; j<MAPSIZE; ++j)
+		{
+			if(tileArray[i][j].type->toString() == "Meadow")
+				outfile<<"G";
+			else if(tileArray[i][j].type->toString() == "Water")
+				outfile<<"W";
+			else if(tileArray[i][j].type->toString() == "Wall")
+				outfile<<"M";
+			else if(tileArray[i][j].type->toString() == "Swamp")
 
-  for (int i = 0; i < MAPSIZE; ++i) {
-    for (int j = 0; j < MAPSIZE; ++j) {
-      if (tileArray[i][j].type->toString() == "Meadow")
-        outfile << "G";
-      else if (tileArray[i][j].type->toString() == "Water")
-        outfile << "W";
-      else if (tileArray[i][j].type->toString() == "Wall")
-        outfile << "M";
-      else if (tileArray[i][j].type->toString() == "Swamp")
+			outfile<<"S";
+		}
+		outfile<<endl;
+	}
+	//Close the file
+        outfile.close();
 
-        outfile << "S";
-    }
-    outfile << endl;
-  }
-  // Close the file
-  outfile.close();
-
-  return true;
+	return true;
 }
 
 bool Map::saveOccupants(string dest) {
