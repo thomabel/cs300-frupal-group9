@@ -11,6 +11,10 @@ GameState::GameState(): map("Frupal.txt", heroX, heroY)
 	cursorX = heroX;
         cursorY =heroY;
 }
+GameState::~GameState()
+{
+	map.saveFile("SavedFile.txt", heroX, heroY);
+}
 
 //Main travel function
 void GameState::travel(int & direction, WINDOW * win)

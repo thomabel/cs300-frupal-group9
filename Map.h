@@ -53,7 +53,7 @@ class Map
 		bool loadOccupants(string src);
 
 		//Write to a file
-		bool saveFile(string dest);
+		bool saveFile(string dest, int heroX, int heroY);
 		bool saveOccupants(string dest);
 
 	private:

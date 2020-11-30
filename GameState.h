@@ -29,6 +29,7 @@ class GameState
 	public:
 		
 		GameState();
+		~GameState();
 		
 		void travel(int & direction, WINDOW * win);
 

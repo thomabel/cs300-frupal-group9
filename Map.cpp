@@ -146,7 +146,7 @@ bool Map::loadOccupants(string src)
         return true;
 }
 
-bool Map::saveFile(string dest)
+bool Map::saveFile(string dest, int heroX, int heroY)
 {
 	//Variable: Outfile
 	ofstream outfile;
@@ -159,7 +159,7 @@ bool Map::saveFile(string dest)
 	//Reopen another file
         outfile.open("Custom.txt", ios::app);
 
-
+	outfile<<"Last Position of Hero: "<<heroX<<","<<heroY<<endl;
 	//Loop through list.
 	
 	for(int i=0;i<MAPSIZE;++i)
