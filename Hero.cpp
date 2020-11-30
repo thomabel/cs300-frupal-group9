@@ -1,3 +1,4 @@
+/*
    Hero class implementation
    November 2020
  */
