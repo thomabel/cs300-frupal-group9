@@ -184,6 +184,7 @@ bool Map::saveOccupants(string dest) {
 
 // Return what type of tile it is
 TileType *Map::tileTypeAt(int row, int col) { return tileArray[row][col].type; }
+
 // Return what  occupies the tile
 TileOccupant *Map::occupantAt(int row, int col) {
   return tileArray[row][col].occupant;
@@ -191,6 +192,16 @@ TileOccupant *Map::occupantAt(int row, int col) {
 // Reveal the tile(Discovered)
 void Map::tile_revealed(int row, int col) {
   tileArray[row][col].revealed = true;
+}
+
+// Remove a tileOccupant, typicaly after it is bought/consumed/looted
+void setOccupantAt(int row, int col, TileOccupant* newOccupant) {
+    TileOccupant *& temp = tileArray[row][col].occupant;
+
+    if (temp)
+        delete temp;
+
+    temp = newOccupant;
 }
 
 // Have we been at tile before

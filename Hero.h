@@ -9,8 +9,8 @@ class Hero{
     public:
     Hero();
     Hero(const  hero &);
-    vector<Tool*> getUsableTools(Obstacle);
-    vector<vector<string>> getToolOptions(Obstacle);
+    vector<Tool*> getUsableTools(Obstacle&);
+    vector<vector<string>> getToolOptions(Obstacle&);
     void addInventory(Tool *);
     bool consumeTool(Tool *);
     int visionRange(void) const;
@@ -19,8 +19,8 @@ class Hero{
     int energy(void) const;
     int addEnergy(int);
     int addWhiffles(int);
-    void giveBinoculars(void);
-    void giveShip(void);
+    void setHasBinoculars(bool);
+    void setHasShip(bool);
 
     private:
     vector<Tool*> inventory_;

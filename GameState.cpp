@@ -165,28 +165,35 @@ bool GameState::HeroTravel(char &direction, WINDOW *menu) {
 }
 // What occupies the tile
 bool GameState::occupantCheck(char &direction, WINDOW *win) {
-  TileOccupant *occupant_temp = map.occupantAt(heroX + MinX, heroY + MinY);
+  
+  /* "Row" does not correspond to the horizontal axis, so this is questionable
+   * at best.
+   */
+  int r = heroX + MinX;
+  int c = heroY + MinY;
+  TileType *tileType = map.tileAt(r, c);
+  TileOccupant *occ = map.occupantAt(r, c);
 
   // Not NULL, we have an occupant
-  if (occupant_temp) {
-    string popupMsg = occupant_temp->promptMsg();
-
-    vector<string> details = occupant_temp->getDetails();
-
+  if (occ) {
     char response = 0;
 
-    /* Give the user the appropriate pop-up for the encounter.
-     * TileOccupant::promptMsg() will give an appropriate message if
-     * the user cannot afford an item.
-     */
-    if (occupant_temp->typeStr() == "Obstacle") {
-      response = UI.popup(popupMsg, details, theHero.getUsableTools());
-    } else {
-      response = UI.popup(popupMsg, details);
-    }
+    // Keep prompting user until they provide a valid response.
+    do {
+      /* Give the user the appropriate pop-up for the encounter.
+       * TileOccupant::promptMsg() will give an appropriate message if
+       * the user cannot afford an item.
+       */
+      response = UI.popup(occ->promptMsg(), occ->getDetails());
 
-    occupant_temp->interact(response, theHero);
-
+      // If encountering an Obstacle, the user needs to see their tool choices.
+      if (occ->typeStr() == "Obstacle") {
+        Obstacle *o = dynamic_cast<Obstacle*>(occ);
+        UI.displayInventory(theHero.getToolOptions(*o));
+      }
+      
+    } while (!occ->interact(response, theHero);
+    
     /* End the game if the Hero is out of energy. The user has been
      * notified via pop-up already.
      */
@@ -198,11 +205,29 @@ bool GameState::occupantCheck(char &direction, WINDOW *win) {
     /* End the game if the Hero found a diamond. The user has been
      * notified via pop-up already.
      */
-    if (occupant_temp->typeStr() == "Diamond") {
+    if (occ->typeStr() == "Diamond") {
       direction = 'w'; // 'w' for "win"? Or is that what "return true" is for?
       return false;
     }
+
+    /* Check whether the tileOccupant should still exist after the interaction.
+     * If not, remove it from the map.
+     */
+    if (!occ->permanent()) {
+      delete occ;
+      map.setOccupantAt(r, c, 0);
+    }
+ 
   }
+
+  /* If the hero is leaving water, then they leave their ship on the shore.
+   * Since this ship was already purchased, it has no cost.
+   */
+  if (theHero.hasShip() && tileType->toString() != "Water") {
+      map.setOccupantAt(r, c, new Ship(0, true))
+      theHero.setHasShip(false);
+  }
+
   return true;
 }
 

@@ -58,7 +58,7 @@ class Ship: public TileOccupant
 {
 	public:
 		Ship();
-		Ship(int whiffleCost);
+		Ship(int whiffleCost, bool bought = false);
 		bool permanent() override;
 		int color() override;
 		char marker() override;

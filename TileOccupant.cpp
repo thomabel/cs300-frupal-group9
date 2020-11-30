@@ -178,7 +178,7 @@ Ship::Ship() : whiffleCost_(0), bought_(false)
 {
 }
 
-Ship::Ship(int whiffleCost) : whiffleCost_(whiffleCost), bought(false)
+Ship::Ship(int whiffleCost, bool bought) : whiffleCost_(whiffleCost), bought_(bought)
 {
 }
 
@@ -279,7 +279,7 @@ bool Ship::interact(char promptResponse, Hero& theHero)
 {
 	if(bought_)
 	{
-		theHero.giveShip();
+		theHero.setHasShip(true);;
 		return true;
 	}
 	else if(theHero.whiffles() < whiffleCost_)
@@ -291,7 +291,7 @@ bool Ship::interact(char promptResponse, Hero& theHero)
 	if(promptResponse == 'y' || promptResponse == 'Y')
 	{
 		theHero.addWhiffles(-whiffleCost_);
-		theHero.giveShip();
+		theHero.setHasShip(true);;
         bought_ = true;
 	}
 
@@ -766,7 +766,7 @@ bool Binoculars::interact(char promptResponse, Hero& theHero)
 		case 'Y':
             bought_ = true;
 			theHero.addWhiffles(-whiffleCost_);
-			theHero.giveBinoculars();
+			theHero.setHasBinoculars(true);
 			break;
 		default:
 			return true;
@@ -1107,7 +1107,7 @@ void Binoculars::interact(char promptResponse, Hero& theHero) override
 
     if (promptResponse == 'y' || promptResponse == 'Y')
     {
-        theHero.giveBinoculars();
+        theHero.setHasBinoculars(true);
         theHero.addWhiffles(-whiffleCost_);
     }
 }

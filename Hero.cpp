@@ -21,7 +21,7 @@ Hero::Hero(const  Hero & orig){
     this->energy_ = orig.energy_;
 }
 //returns list of tools usable on Obstacle
-vector<Tool*> Hero::getUsableTools(Obstacle current){
+vector<Tool*> Hero::getUsableTools(Obstacle &current){
     vector<Tool*> usableTools_;
     for(auto i = inventory_.cbegin(); i != inventory_.cend(); ++i){
         if(i->usableOn(current)){
@@ -32,7 +32,7 @@ vector<Tool*> Hero::getUsableTools(Obstacle current){
     return usableTools_;
 }
 
-vector<vector<string>> getToolOptions(Obstacle current) {
+vector<vector<string>> getToolOptions(Obstacle &current) {
     vector<Tool*> tools = getUsableTools(current);
     vector<vector<string>> options;
 
@@ -78,12 +78,12 @@ int Hero::addEnergy(int value){
     return energy_;
 }
 
-void Hero::giveBinoculars(void){
-    hasBinoculars_ = true;
+void Hero::setHasBinoculars(bool hasBinoculars){
+    hasBinoculars_ = hasBinoculars;
 }
 
-void Hero::giveShip(void) {
-    hasShip_ = true;
+void Hero::setHasShip(bool hasShip) {
+    hasShip_ = hasShip;
 }
 
 //getter functions
