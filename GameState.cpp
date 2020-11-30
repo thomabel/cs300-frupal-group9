@@ -214,7 +214,7 @@ bool GameState::occupantCheck(char & direction, WINDOW * win)
 	//Not NULL, we have an occupant
 	if(occupant_temp)
 	{
-                string popupMsg = occupant_temp->promptMsg();
+    string popupMsg = occupant_temp->promptMsg();
 
 		vector<string> details = occupant_temp->getDetails();
 
@@ -226,7 +226,7 @@ bool GameState::occupantCheck(char & direction, WINDOW * win)
 		 */
 		if (occupant_temp->typeStr() == "Obstacle")
 		{
-                        response = UI.popup(popupMsg, details, 
+              response = UI.popup(popupMsg, details, 
 			        theHero.getUsableTools());
 		}
 		else
@@ -234,13 +234,13 @@ bool GameState::occupantCheck(char & direction, WINDOW * win)
 			response = UI.popup(popupMsg, details);
 		}
 
-                occupant_temp->interact(response, theHero);
+    occupant_temp->interact(response, theHero);
 
 		/* End the game if the Hero is out of energy. The user has been
 		 * notified via pop-up already.
 		 */
 		if (theHero.energy <= 0)
-	        {
+	  {
 			direction = 'q';
 			return false;
 		}
@@ -258,64 +258,87 @@ bool GameState::occupantCheck(char & direction, WINDOW * win)
 	return true;
 }
 
-//How much the hero can see on his journey
+
 void GameState::HeroVision()
 {
-	int visionMax = theHero.visionRange()+1; //With B = 2 without = 1
-
-	if((heroY < MaxScreenY && heroY >= 0) && (heroX < MenuBorder && heroX >= 0))
+	//With Binoculars = 2 without = 1
+	if(theHero.visionRange() == 1)
+		HeroVision(heroY,heroX);
+	else
 	{
-		for(int l = 1; l < visionMax; l++)
+		HeroVision(heroY, heroX);
+		int temp = heroX - 1;
+		for(int i = 0; i<4; ++i)
 		{
-			//This is for the hero later on don't need to worry about it now
-			int checkJ = heroX-1;
-			int checkI = heroY;
-			int i = heroY;
-			int j = heroX;
-			for(int k = 0; k<8;k++)
+			if(i > 1)
 			{
-				//If we are at 2 or 4 then
-				//Go up or down 2D array.
-				if(k == 2 || k == 4)
-				{
-					if(k==4)
-						//Up 2D array
-						checkI = i-1;
-					else
-						//Down 2D array
-						checkI = i+1;
-					//Left
-					checkJ = j-1;
-				}
-				else if(k==6)
-				{
-					//Check upper cell from original cell we are checking
-					checkI = i-1;
-					//Stay same column
-					checkJ = j;
-				}
-				//Don't go outside the boundries of array
-				if((checkI >= 0 && checkI <MaxScreenY) && (checkJ >=0 && checkJ < MenuBorder))
-				{
-					//Tile is discovered, set it to true
-					 map.tile_revealed(checkI+MinY, checkJ+MinX);
-					 //array[checkI+MinY][checkJ+MinX].used = true;
-				}
-				if(k==6)
-					//check down
-					checkI = i+1;
-				else
-					//check right
-					checkJ = j+1;
+				 HeroVision(heroY+1, temp);
+				 temp = heroX - 1;
 			}
+			else
+			{
+				HeroVision(heroY-1, temp);
+				temp = heroX + 1;
+			}
+		}
+	}
+}
+//How much the hero can see on his journey
+void GameState::HeroVision( int tempHeroY, int tempHeroX)
+{
+
+	if((tempHeroY < MaxScreenY && tempHeroY >= 0) && (tempHeroX < MenuBorder && tempHeroX >= 0))
+	{
+		//This is for the hero later on don't need to worry about it now
+		int checkJ = tempHeroX-1;
+		int checkI = tempHeroY;
+		int i = tempHeroY;
+		int j = tempHeroX;
+		for(int k = 0; k<8;k++)
+		{
+			//If we are at 2 or 4 then
+			//Go up or down 2D array.
+			if(k == 2 || k == 4)
+			{
+				if(k==4)
+					//Up 2D array
+					checkI = i-1;
+				else
+					//Down 2D array
+					checkI = i+1;
+				//Left
+				checkJ = j-1;
+			}
+			else if(k==6)
+			{
+				//Check upper cell from original cell we are checking
+				checkI = i-1;
+				//Stay same column
+				checkJ = j;
+			}
+			//Don't go outside the boundries of array
+			if((checkI >= 0 && checkI <MaxScreenY) && (checkJ >=0 && checkJ < MenuBorder))
+			{
+				//Tile is discovered, set it to true
+				 map.tile_revealed(checkI+MinY, checkJ+MinX);
+				 //array[checkI+MinY][checkJ+MinX].used = true;
+			}
+			if(k==6)
+				//check down
+				checkI = i+1;
+			else
+				//check right
+				checkJ = j+1;
 		}
 	}
 }
 //Inspect tiles with cursor
 void GameState::cursorTravel(char direction)
 {
-	//TileType * temp_type = NULL;
+	TileType * temp_type = NULL;
         TileOccupant * occupant_temp = NULL;
+	string temp;
+	vector <string> details;
 
 	switch(direction)
 	{
@@ -356,9 +379,33 @@ void GameState::cursorTravel(char direction)
 
 	}
 	//Pass in tileType and Occupant to inspect 
-	//temp_type = map.tileTypeAt(heroX+MinX, heroY+MinY);
-	occupant_temp = map.occupantAt(heroX+MinX, heroY+MinY);
-	UI.tileInspect(occupant_temp.getdetails());
+
+	if(isTileDiscovered(cursorX+MinX, cursorY+MinY)){ 
+		temp_type= map.tileTypeAt(cursorX+MinX, cursorY+MinY);
+		occupant_temp = map.occupantAt(cursorX+MinX, cursorY+MinY);
+
+		if(occupant_temp){
+			details = occupant_temp->getdetails();
+		//	if(details.size() % 2 == 0)
+		//	{
+		//	I think that details should give an even vector.
+			int i = details.size()/2;
+			temp = temp_type.toString();
+			details.insert(details.begin(),temp);
+			details.insert(details.begin() + i, "Grovnick");
+			UI.tileInspect(details);
+
+
+		//	}
+
+		}
+		else{
+			temp = temp_type.toString();
+			details.push_back(temp);
+			details.push_back("Grovnick");
+			UI.tileInspect(details);
+		}
+	}
 
 
 	

@@ -4,10 +4,6 @@
 Tile::Tile() : revealed(false), type(0), occupant(0)
 {}
 
-Map::Map()
-{
-	//Default Map?
-}
 Map::Map(string srcFile)
 {
 	if(!(loadFile(srcFile)))
@@ -62,7 +58,6 @@ bool Map::loadFile(string src)
 						tileArray[i][j].type = new Meadow; //Color num 2
 						break;
 				}
-
 
                                 ++j;
 
@@ -167,8 +162,8 @@ bool Map::saveFile(string dest)
 			else if(tileArray[i][j].type->toString() == "Wall")
 				outfile<<"M";
 			else if(tileArray[i][j].type->toString() == "Swamp")
-				outfile<<"S";
 
+			outfile<<"S";
 		}
 		outfile<<endl;
 	}
@@ -250,19 +245,30 @@ bool Map::isTileDiscovered(int row, int col)
 //Display what is discovered
 void Map::displayMap(WINDOW * win)
 {
-
-		//Print the Grovnicks that are used
-		for(int i = MinY; i<MaxY; ++i)
+	char MarkerDisplay;
+	//Print the Grovnicks that are used
+	for(int i = MinY; i<MaxY; ++i)
+	{
+		for(int j = MinX; j<MaxX; ++j)
 		{
-			for(int j = MinX; j<MaxX; ++j)
+			if(tileArray[i][j].revealed)
 			{
-				if(tileArray[i][j].revealed)
+				if(tileArray[i][j].occupant)
+					MarkerDisplay = tileArray[i][j].occupant->marker();
+				else
+					MarkerDisplay = " ";
+
+				if(tileArray[i][j].occupant != NULL && tileArray[i][j].occupant == Diamond)
 				{
-
-					attron(COLOR_PAIR(tileArray[i][j].type->color()));
-					mvwprintw(win,i -MinY ,j-MinX," ");
+					attron(COLOR_PAIR(1));
+					mvwprintw(win,i -MinY ,j-MinX, MarkerDisplay);
 				}
-
+				else
+				{
+					attron(COLOR_PAIR(tileArray[i][j].type->color()));
+					mvwprintw(win,i -MinY ,j-MinX, MarkerDisplay);
+				}
 			}
 		}
+	}
 }
