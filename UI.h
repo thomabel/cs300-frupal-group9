@@ -11,25 +11,30 @@ Date: 2020-11-19
 #include <vector>
 
 class UserInterface {
-private:
-
 public:
     // Starts the UI by creating all necessary windows/panels.
-	bool initialize();
+	bool initialize(unsigned int width = WIDTH);
     // Displays information on the side window.
     void actions(std::vector<std::string> values);
     void tileInspect(std::vector<std::string> values);
     void whifflesEnergy(int whiffles, int energy);
     // Opens a new panel to show the player inventory.
-    void displayInventory(std::vector<std::vector<std::string>> tools);
+    char displayInventory(
+        std::vector<std::vector<std::string>> tools,
+        bool getInput = false);
     char popup(std::string msg);
     char popup(std::string msg, std::vector<std::string> values);
+    char popup(std::string msg, std::vector<std::string> obstacle,
+        std::vector<std::vector<std::string>> values); 
 
 private:
+    const char CTRL_UP = 'i';
+    const char CTRL_DOWN = 'k';
+    const char CTRL_INV = 'h';
     // The minimum screensize allowed by the UI.
     const int MINY = 20;
     const int MINX = 80;
-    const unsigned int WIDTH = 24;
+    const static unsigned int WIDTH = 24;
     // The border characters.
     const char BVER = '#';
     const char BHOR = '=';

@@ -1,19 +1,28 @@
 #include "Map.h"
 #include "CsvToOccupant.h"
+#include <stdexcept>
 
 Tile::Tile() : revealed(false), type(0), occupant(0)
 {}
 
-Map::Map(string srcFile)
+Tile::~Tile()
 {
-	if(!(loadFile(srcFile)))
+	if(type)
+		delete type;
+	if(occupant)
+		delete occupant;
+}
+
+Map::Map(string srcFile, int & heroX, int & heroY)
+{
+	if(!(loadFile(srcFile, heroX, heroY)))
 	{
-		cout<<"File cannot open"<<endl;
+		throw runtime_error("File cannot open");
 	}
 }
 
 //Read in the map
-bool Map::loadFile(string src)
+bool Map::loadFile(string src, int & heroX, int & heroY)
 {
 
         string temp;
@@ -30,7 +39,10 @@ bool Map::loadFile(string src)
          //If file was open sucessfully then eneter
         if(infile)
         {
-
+		infile>>heroX;
+                infile.ignore(100,',');
+                infile>>heroY;
+                infile.ignore(100,'\n');
                 //If end of file is not triggered then enter the loop
                 while(getline(infile,temp))
                 {
@@ -71,71 +83,98 @@ bool Map::loadFile(string src)
                 }
                 infile.close();
 
+    // If end of file is not triggered then enter the loop
+    while (getline(infile, temp)) {
+      for (unsigned int k = 0; k < temp.size(); ++k) {
+
+        if (j == MAPSIZE) {
+          ++i;
+          j = 0;
         }
-	else
-	{
-		return false;
-	}
-	/*
-	attron(COLOR_PAIR(5));
-	mvwprintw(win,5 ,5," ");
-	wrefresh(win);
-	*/
-	
-	return true; // placeholder for better things
+
+        switch (temp[k]) {
+        case 'W':
+          tileArray[i][j].type = new Water; // Color num 4
+          break;
+        case 'M':
+          tileArray[i][j].type = new Wall; // Color num 7
+          break;
+        case 'S':
+          tileArray[i][j].type = new Swamp; // Color num 5
+          break;
+        case 'G':
+          tileArray[i][j].type = new Meadow; // Color num 2
+          break;
+        }
+
+        ++j;
+
+        // How should we go about occupants?
+      }
+    }
+    infile.close();
+
+  } else {
+    return false;
+  }
+  /*
+  attron(COLOR_PAIR(5));
+  mvwprintw(win,5 ,5," ");
+  wrefresh(win);
+  */
+
+  return true; // placeholder for better things
 }
 
-bool Map::loadOccupants(string src)
-{
-        string temp;
+bool Map::loadOccupants(string src) {
+  string temp;
 
-        ifstream fin(src);
+  ifstream fin;
 
-        if (fin)
-        {
-                getline(fin, temp);
-                int qty = stoi(temp);
-                
-                for(int i = 0; i < qty; ++i)
-                {
-			// Discard whitespace line
-                        getline(fin, temp);
-                        
-                        // Read coordinates of tileOccupant
-                        getline(fin, temp, ',');
-                        int row = stoi(temp);
-                        getline(fin, temp);
-                        int col = stoi(temp);
-                        
-                        // Read tileOccupant type string (without trailing
-                        // whitespace)
-                        getline(fin, temp);
-                        string type = temp.erase(
-                                temp.find_last_not_of(" \n\t"));
-                                
-                        // Read tileOccupant data as comma-separated values
-                        getline(fin, temp);
-                        
-                        // Quit and fail if there were issues with the stream
-                        if (!fin)
-                                return false;
-                        
-                        // If the tile already has an occupant, remove it.
-                        if (tileArray[row][col] != 0)
-                        	delete tileArray[row][col];
-                        	
-                        tileArray[row][col].occupant = newOccupant(type, temp);
-                }
-        }
-	else
-	{
-                return false;
-	}
+  fin.open(src);
 
-        return true;
+  if (fin) {
+    getline(fin, temp);
+    int qty = stoi(temp);
+
+    for (int i = 0; i < qty; ++i) {
+      // Discard whitespace line
+      getline(fin, temp);
+
+      // Read coordinates of tileOccupant
+      getline(fin, temp, ',');
+      int row = stoi(temp);
+      getline(fin, temp);
+      int col = stoi(temp);
+
+      // Read tileOccupant type string (without trailing
+      // whitespace)
+      getline(fin, temp);
+      string type = temp.erase(temp.find_last_not_of(" \n\t"));
+
+      // Read tileOccupant data as comma-separated values
+      getline(fin, temp);
+
+      // Quit and fail if there were issues with the stream
+      if (!fin)
+        return false;
+
+      // If the tile already has an occupant, remove it.
+     
+      // TODO: IDEALLY MAKE THIS WORK
+      //if (tileArray[row][col].occupant != 0)
+      //  delete tileArray[row][col].occupant;
+
+      tileArray[row][col].occupant = newOccupant(type, temp);
+    }
+  } else {
+    return false;
+  }
+
+  return true;
 }
 
-bool Map::saveFile(string dest)
+bool Map::saveFile(string dest, int heroX, int heroY)
 {
 	//Variable: Outfile
 	ofstream outfile;
@@ -148,7 +187,7 @@ bool Map::saveFile(string dest)
 	//Reopen another file
         outfile.open("Custom.txt", ios::app);
 
-
+	outfile<<"Last Position of Hero: "<<heroX<<","<<heroY<<endl;
 	//Loop through list.
 	
 	for(int i=0;i<MAPSIZE;++i)
@@ -173,102 +212,93 @@ bool Map::saveFile(string dest)
 	return true;
 }
 
-bool Map::saveOccupants(string dest)
-{
-        ofstream fout("CustomOccupants.txt");
+bool Map::saveOccupants(string dest) {
+  ofstream fout("CustomOccupants.txt");
 
-	// Collect occupants (in order to count) before saving to file.
-	vector<TileOccupant*> occupants;
-	vector<int> rows;
-	vector<int> cols;
+  // Collect occupants (in order to count) before saving to file.
+  vector<TileOccupant *> occupants;
+  vector<int> rows;
+  vector<int> cols;
 
-	for (int i = 0; i < MAPSIZE; ++i)
-	{
-		for (int j = 0; j < MAPSIZE; ++j)
-		{
-			TileOccupant *occ = tileArray[i][j].occupant;
-			
-			if (occ)
-			{
-                                occupants.push_back(occ);
-				rows.push_back(i);
-				cols.push_back(j);
-			}
-		}
-	
-	}
+  for (int i = 0; i < MAPSIZE; ++i) {
+    for (int j = 0; j < MAPSIZE; ++j) {
+      TileOccupant *occ = tileArray[i][j].occupant;
 
-	if (fout)
-	{
-		fout << occupants.size() << "\n";
+      if (occ) {
+        occupants.push_back(occ);
+        rows.push_back(i);
+        cols.push_back(j);
+      }
+    }
+  }
 
-		for (int i = 0; i < occupants.size(); ++i)
-		{
-			fout << "\n" << rows[i] << "," cols[i] << "\n"
-				<< occupants[i]->typeStr() << "\n"
-				<< occupants[i]->dataAsCsv() << "\n";
-		}
-	}
+  if (fout) {
+    fout << occupants.size() << "\n";
+
+    for (unsigned int i = 0; i < occupants.size(); ++i) {
+      fout << "\n"
+           << rows[i] << "," << cols[i] << "\n"
+           << occupants[i]->typeStr() << "\n"
+           << occupants[i]->dataAsCsv() << "\n";
+    }
+  } else {
+    return false;
+  }
+
+  return true;
+}
+
+// Return what type of tile it is
+TileType *Map::tileTypeAt(int row, int col) { return tileArray[row][col].type; }
+
+// Return what  occupies the tile
+TileOccupant *Map::occupantAt(int row, int col) {
+  return tileArray[row][col].occupant;
+}
+// Reveal the tile(Discovered)
+void Map::tile_revealed(int row, int col) {
+  tileArray[row][col].revealed = true;
+}
+
+// Remove a tileOccupant, typicaly after it is bought/consumed/looted
+void Map::setOccupantAt(int row, int col, TileOccupant* newOccupant) {
+    TileOccupant *& temp = tileArray[row][col].occupant;
+
+    if (temp)
+        delete temp;
+
+    temp = newOccupant;
+}
+
+// Have we been at tile before
+bool Map::isTileDiscovered(int row, int col) {
+  if (tileArray[row][col].revealed)
+    return true;
+
+  return false;
+}
+
+// Display what is discovered
+void Map::displayMap(WINDOW *win) {
+  string MarkerDisplay;
+  // Print the Grovnicks that are used
+  for (int i = MinY; i < MaxY; ++i) {
+    for (int j = MinX; j < MaxX; ++j) {
+      if (tileArray[i][j].revealed) {
+        if (tileArray[i][j].occupant)
+          MarkerDisplay = string(1, tileArray[i][j].occupant->marker());
         else
-	{
-	        return false;	
-	}
+          MarkerDisplay = " ";
 
-	return true;
-}
-
-//Return what type of tile it is
-TileType * Map::tileTypeAt(int row, int col)
-{
-	return tileArray[row][col].type;
-}
-//Return what  occupies the tile
-TileOccupant * Map::occupantAt(int row, int col)
-{
-	return tileArray[row][col].occupant;
-}
-//Reveal the tile(Discovered)
-void Map::tile_revealed(int row, int col)
-{
-	tileArray[row][col].revealed = true;
-}
-
-//Have we been at tile before
-bool Map::isTileDiscovered(int row, int col)
-{
-	if(tileArray[row][col].revealed)
-		return true;
-
-	return false;
-}
-
-//Display what is discovered
-void Map::displayMap(WINDOW * win)
-{
-	char MarkerDisplay;
-	//Print the Grovnicks that are used
-	for(int i = MinY; i<MaxY; ++i)
-	{
-		for(int j = MinX; j<MaxX; ++j)
-		{
-			if(tileArray[i][j].revealed)
-			{
-				if(tileArray[i][j].occupant)
-					MarkerDisplay = tileArray[i][j].occupant->marker();
-				else
-					MarkerDisplay = " ";
-
-				if(tileArray[i][j].occupant != NULL && tileArray[i][j].occupant == Diamond)
-				{
-					attron(COLOR_PAIR(1));
-					mvwprintw(win,i -MinY ,j-MinX, MarkerDisplay);
-				}
-				else
-				{
-					attron(COLOR_PAIR(tileArray[i][j].type->color()));
-					mvwprintw(win,i -MinY ,j-MinX, MarkerDisplay);
-				}
-			}
-		}
-	}
+        if (tileArray[i][j].occupant != NULL &&
+            tileArray[i][j].occupant->typeStr() == "Diamond") {
+          attron(COLOR_PAIR(1));
+          mvwprintw(win, i - MinY, j - MinX, MarkerDisplay.data());
+        } else {
+          attron(COLOR_PAIR(tileArray[i][j].type->color()));
+          mvwprintw(win, i - MinY, j - MinX, MarkerDisplay.data());
+        }
+      }
+    }
+  }
 }

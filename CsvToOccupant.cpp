@@ -88,7 +88,7 @@ TileOccupant *csvToObstacle(const string &csv)
         
         getline(input, name, ',');
         getline(input, temp, ',');
-        energy = stoi(temp);
+        energyCost = stoi(temp);
         
         return new Obstacle(name, energyCost);
 }

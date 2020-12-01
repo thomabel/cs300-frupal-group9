@@ -1,5 +1,10 @@
+#ifndef TileType_CLASS
+#define TileType_CLASS
+
 #include <string>
 #include "Hero.h"
+
+class Hero;
 
 class TileType
 {
@@ -19,7 +24,7 @@ class Meadow : public TileType
     std::string toString() const override;
 };
 
-class Wall : plublic TileType
+class Wall : public TileType
 {
     bool canEnter(const Hero& theHero) const override;
     int color() const override;
@@ -41,3 +46,4 @@ class Water : public TileType
     std::string toString() const override;
 };
 
+#endif

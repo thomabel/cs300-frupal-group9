@@ -10,11 +10,60 @@ Description:
 
 using namespace std;
 
+
+int charToChoiceIndex(char c)
+{
+    if (c >= '0' && c <= '9')
+        return c - '0';
+    if (c >= 'a' && c <= 'z')
+        return c - 'a' + 10;
+    if (c >= 'A' && c <= 'Z')
+        return c - 'A' + 36;
+
+    return -1; /* if ( (c < '0' && c > '9') || (c < 'a' && c > 'z') ||
+        (c < 'A' && c > 'Z') )      
+        */ 
+}
+
+char choiceIndexToChar(int ind)
+{
+    char i = static_cast<char>(ind);
+
+    if (i >= 0 && i < 10)
+        return '0' + i;  
+    if (i >= 10 && i < 36)
+        return 'a' + i;
+    if (i >= 36 && i < 62)
+        return 'A' + i;
+    
+    return -1; // if (i < 0 || i >= 62)
+}
+
 /*
 TileOccupant abstract base class
 */
 TileOccupant::TileOccupant()
 {
+}
+
+TileOccupant::~TileOccupant()
+{
+}
+
+/* Interact is a virtual function. For all classes that override it, returning
+ * "true" indicates a valid "promptResponse." If interact returns "false", then
+ * the caller must prompt the user for a new reponse and call interact again.
+ */
+bool TileOccupant::interact(char promptResponse, Hero& theHero)
+{
+    // This serves as a default case: only allow response of y/n
+    if (promptResponse != 'y' && (promptResponse != 'Y' &&
+        (promptResponse != 'n' && promptResponse != 'N')))
+    {
+        return false;
+    }
+
+    return true;
 }
 
 /*
@@ -68,7 +117,7 @@ Return:		vector<string> - object data to pass to ui
 vector<string> Treasure::getDetails()
 {
 	vector<string> data;
-	data.push_back(" ");
+	data.push_back("");
 	data.push_back(to_string(worth_));
 	data.push_back("Treasure");
 	data.push_back("Worth");
@@ -85,7 +134,7 @@ Return:		string - message to display to player
 */
 string Treasure::promptMsg(Hero& theHero)
 {
-	string msg = "A treasure chest has been found " 
+	string msg = string("A treasure chest has been found ")
 			+ "containing: " + to_string(worth_) 
 			+ " Whiffles!";
 	return msg;
@@ -99,11 +148,23 @@ Arguments:	char - player response to prompt
 		Hero& - player 
 Return:		none
 */
-void Treasure::interact(char promptResponse, Hero& theHero)
+bool Treasure::interact(char promptResponse, Hero& theHero)
 {
 	theHero.addWhiffles(worth_);
+
+    // Treasure does not use promptResponse, so the value is always valid.
+    return true;
 }
 
+string Treasure::typeStr() const
+{
+    return "Treasure";
+}
+
+string Treasure::dataAsCsv() const
+{
+    return to_string(worth_);
+}
 
 /*
 /////////////////////////////////////////////////////////////////
@@ -117,7 +178,7 @@ Ship::Ship() : whiffleCost_(0), bought_(false)
 {
 }
 
-Ship::Ship(int whiffleCost) : whiffleCost_(whiffleCost), bought(false)
+Ship::Ship(int whiffleCost, bool bought) : whiffleCost_(whiffleCost), bought_(bought)
 {
 }
 
@@ -129,7 +190,7 @@ Return:		none
 */
 bool Ship::permanent()
 {
-	return false;
+	return !bought_;
 }
 
 /*
@@ -163,7 +224,7 @@ Return:		vector<string> - object data to pass to ui
 vector<string> Ship::getDetails()
 {
 	vector<string> data;
-	data.push_back(" ");
+	data.push_back("");
 	data.push_back(to_string(whiffleCost_));
 	if(bought_)
 		data.push_back("True");
@@ -214,21 +275,39 @@ Arguments:	char - player response to prompt
 		Hero& - player 
 Return:		none
 */
-void Ship::interact(char promptResponse, Hero& theHero)
+bool Ship::interact(char promptResponse, Hero& theHero)
 {
 	if(bought_)
 	{
-		theHero.giveShip();
-		return;
+		theHero.setHasShip(true);;
+		return true;
 	}
 	else if(theHero.whiffles() < whiffleCost_)
-		return;
+		return true;
+
+    if (!TileOccupant::interact(promptResponse, theHero))
+    {
+        return false;
+    }
 
 	if(promptResponse == 'y' || promptResponse == 'Y')
 	{
 		theHero.addWhiffles(-whiffleCost_);
-		theHero.giveShip();
+		theHero.setHasShip(true);;
+        bought_ = true;
 	}
+
+    return true;
+}
+
+string Ship::typeStr() const
+{
+    return "Ship";
+}
+
+string Ship::dataAsCsv() const
+{
+    return to_string(whiffleCost_);
 }
 
 /*
@@ -237,11 +316,20 @@ void Ship::interact(char promptResponse, Hero& theHero)
 /////////////////////////////////////////////////////////////////
 */
 
-Tool::Tool() : name_(0), whiffleCost_(0), rating_(0), forObstacles(0)
+Tool::Tool() : name_(0), whiffleCost_(0), rating_(0), forObstacles(0), 
+    bought_(false)
 {
 }
 
-Tool::Tool(string name, int whiffleCost, int rating, vector<string> usableOn) : name_(name), whiffleCost_(whiffleCost), rating_(rating), forObstacles(usableOn)
+Tool::Tool(const Tool& toCopy) : name_(toCopy.name_), whiffleCost_(toCopy.
+    whiffleCost_), rating_(toCopy.rating_), forObstacles(toCopy.forObstacles), 
+    bought_(toCopy.bought_)
+{
+}
+
+Tool::Tool(string name, int whiffleCost, int rating, vector<string> usableOn) 
+    : name_(name), whiffleCost_(whiffleCost), rating_(rating)
+    , forObstacles(usableOn), bought_(false)
 {
 }
 
@@ -252,10 +340,10 @@ Arguments:	Obstacle& - obstacle to check against
 Return:		bool - true if usable on obstacle, 
 			false if not
 */
-bool Tool::usableOn(const Obstacle& onObstacle)
+bool Tool::usableOn(const Obstacle& onObstacle) const
 {
-	vector<string>::iterator i;
-	for(i=forObstacles.begin(); i<forObstacles.end(); i++)
+	//vector<string>::iterator i;
+	for(auto i=forObstacles.cbegin(); i<forObstacles.cend(); i++)
 	{
 		if(*i == onObstacle.name())
 			return true;
@@ -283,7 +371,7 @@ Return:		bool - true if permanent,
 */
 bool Tool::permanent()
 {
-	return false;
+	return !bought_;
 }
 
 /*
@@ -316,30 +404,26 @@ Return:		vector<string> - object data to pass to ui
 */
 vector<string> Tool::getDetails()
 {
-	int obstacleCount;
-
 	vector<string> data;
 	// push name of tool to vector
 	data.push_back(name_);
 
 	// push all strings from forObstacles
-	obstacleCount = 0;
+	string obstacleList;
 	for (vector<string>::iterator it = forObstacles.begin()
 		; it != forObstacles.end(); ++it)
 	{
-		data.push_back(*it);
-		++obstacleCount;
+		obstacleList = obstacleList + *it;
+		 
 	}
-
+	data.push_back(obstacleList);
 	// push values for cost and rating
 	data.push_back(to_string(whiffleCost_));
 	data.push_back(to_string(rating_));
 	
 	// push labels 
-	for (int i = 0; i < obstacleCount; ++i)
-	{
-		data.push_back("Obstacle");
-	}
+	data.push_back("Tool");
+	data.push_back("Obstacle");
 	data.push_back("Cost");
 	data.push_back("Rating");
 
@@ -361,10 +445,10 @@ string Tool::promptMsg(Hero& theHero)
 	{
 		msg = msg + name_ + "\n";
 		// get all obstacles tool works for
-		for (vector<string>::iterator it = forObstacles.begin()
+		for (auto it = forObstacles.begin()
 			; it != forObstacles.end(); ++it)
 		{
-			msg = msg + *it.name() + " : Obstacle\n";
+			msg = msg + (*it) + " : Obstacle\n";
 		}
 		
 		// get tool cost and rating
@@ -376,7 +460,7 @@ string Tool::promptMsg(Hero& theHero)
 	}
 	else
 	{
-		msg = msg + "But you don't have enough Whiffles! "			+ "Sorry!";
+		msg = msg + "But you don't have enough Whiffles! " + "Sorry!";
 	}
 	return msg;
 }
@@ -388,23 +472,48 @@ Arguments:	char - player response to prompt
 		Hero& - player
 Return:		none
 */
-void Tool::interact(char promptResponse, Hero& theHero)
+bool Tool::interact(char promptResponse, Hero& theHero)
 {
-	if(theHero.whiffles() < whiffleCost_)
-		return;
+	if(theHero.whiffles() < whiffleCost_) {
+		return true;
+    }
+	
+    if (!TileOccupant::interact(promptResponse, theHero)) {
+        return false;
+    }
 
 	switch(promptResponse)
 	{
 		case 'y':
 		case 'Y':
+            bought_ = true;
 			theHero.addWhiffles(-whiffleCost_);
-			theHero.addInventory(this);
+			theHero.addInventory(new Tool(*this));
 			break;
 		default:
-			return;
+			return true;
 	}
+
+    return true;
 }
 
+string Tool::typeStr() const
+{
+    return "Tool";
+}
+
+string Tool::dataAsCsv() const
+{
+    string ret = name_ + "," + to_string(whiffleCost_) + "," + 
+        to_string(rating_) + "," +  to_string(forObstacles.size());
+
+    for (unsigned int i = 0; i < forObstacles.size(); ++i)
+    {
+        ret += "," + forObstacles.at(i);
+    }
+
+    return ret;
+}
 
 /*
 /////////////////////////////////////////////////////////////////
@@ -412,13 +521,14 @@ void Tool::interact(char promptResponse, Hero& theHero)
 /////////////////////////////////////////////////////////////////
 */
 
-Food::Food(): name_(0), whiffleCost_(0), energyProvided_(0)
+Food::Food(): name_(0), whiffleCost_(0), energyProvided_(0),
+    consumed_(false)
 {
 }
 
 Food::Food(string name, int whiffleCost, int energyProvided)
 	: name_(name), whiffleCost_(whiffleCost)
-	, energyProvided_(energyProvided)
+	, energyProvided_(energyProvided), consumed_(false)
 {
 }
 
@@ -430,7 +540,7 @@ Return:		bool - true if perm, false if not
 */
 bool Food::permanent()
 {
-	return false;
+	return !consumed_;
 }
 
 /*
@@ -510,20 +620,40 @@ Arguments:	char - prompt response key
 		, Hero& - hero to interact with
 Return:		string - message to display
 */
-void Food::interact(char promptResponse, Hero& theHero)
+bool Food::interact(char promptResponse, Hero& theHero)
 {
-	if(theHero.whiffles() < whiffleCost_)
-		return;
+	if(theHero.whiffles() < whiffleCost_) {
+		return true;
+    }
+
+    if (!TileOccupant::interact(promptResponse, theHero)) {
+        return false;
+    }
+
 	switch(promptResponse)
 	{
 		case 'y':
 		case 'Y':
+            consumed_ = true;
 			theHero.addWhiffles(-whiffleCost_);
 			theHero.addEnergy(energyProvided_);
 			break;
 		default:
-			return;
+			return true;
 	}
+
+    return true;
+}
+
+string Food::typeStr() const
+{
+    return "Food";
+}
+
+string Food::dataAsCsv() const
+{
+    return name_ + "," + to_string(whiffleCost_) + "," + 
+        to_string(energyProvided_);
 }
 
 /*
@@ -532,11 +662,12 @@ void Food::interact(char promptResponse, Hero& theHero)
 /////////////////////////////////////////////////////////////////
 */
 
-Binoculars::Binoculars(): whiffleCost_(0)
+Binoculars::Binoculars(): whiffleCost_(0), bought_(false)
 {
 }
 
-Binoculars::Binoculars(int whiffleCost): whiffleCost_(whiffleCost)
+Binoculars::Binoculars(int whiffleCost): whiffleCost_(whiffleCost),
+    bought_(false)
 {
 }
 
@@ -548,7 +679,7 @@ Return:		bool - true if perm, false if not
 */
 bool Binoculars::permanent()
 {
-	return false;
+	return !bought_;
 }
 
 /*
@@ -579,12 +710,9 @@ Description:	gets data to send to ui
 Arguments:	none
 Return:		vector<string> - data strings for ui
 */
-vector<string> Binoculars::getDetails()
+std::vector<std::string> Binoculars::getDetails()
 {
-	vector<string> data;
-	data.push_back("Binoculars");
-	
-	return data;
+	return vector<string>{"", to_string(whiffleCost_), "Binoculars", "Price"};
 }
 
 /*
@@ -619,22 +747,40 @@ Arguments:	char - prompt response key
 		, Hero& - hero to interact with
 Return:		string - message to display
 */
-void Binoculars::interact(char promptResponse, Hero& theHero)
+bool Binoculars::interact(char promptResponse, Hero& theHero)
 {
-	if(theHero.whiffles() < whiffleCost_)
-		return;
+	if(theHero.whiffles() < whiffleCost_) {
+		return true;
+    }
+
+    if (!TileOccupant::interact(promptResponse, theHero)) {
+        return false;
+    }
+
 	switch(promptResponse)
 	{
 		case 'y':
 		case 'Y':
+            bought_ = true;
 			theHero.addWhiffles(-whiffleCost_);
-			theHero.giveBinoculars();
+			theHero.setHasBinoculars(true);
 			break;
 		default:
-			return;
+			return true;
 	}
+
+    return true;
 }
 
+string Binoculars::typeStr() const
+{
+    return "Binoculars";
+}
+
+string Binoculars::dataAsCsv() const
+{
+    return to_string(whiffleCost_);
+}
 
 /*
 /////////////////////////////////////////////////////////////////
@@ -692,8 +838,10 @@ Return:		vector<string> - data strings for ui
 vector<string> Clue::getDetails()
 {
 	vector<string> data;
+	data.push_back("");
+	data.push_back(msg_);
 	data.push_back("Clue");
-	
+	data.push_back("Message");
 	return data;
 }
 
@@ -718,10 +866,20 @@ Arguments:	char - prompt response key
 		, Hero& - hero to interact with
 Return:	
 */
-void Clue::interact(char promptResponse, Hero& theHero)
+bool Clue::interact(char promptResponse, Hero& theHero)
 {
+    return true;
 }
 
+string Clue::typeStr() const
+{
+    return "Clue";
+}
+
+string Clue::dataAsCsv() const
+{
+    return msg_;
+}
 
 /*
 /////////////////////////////////////////////////////////////////
@@ -776,6 +934,7 @@ vector<string> Diamond::getDetails()
 {
 	vector<string> data;
 
+	data.push_back("");
 	data.push_back("Royal Diamonds");
 
 	return data;
@@ -800,15 +959,33 @@ Arguments:	char - prompt response key
 		, Hero& - hero to interact with
 Return:	
 */
-void Diamond::interact(char promptResponse, Hero& theHero)
+bool Diamond::interact(char promptResponse, Hero& theHero)
 {
+    return true;
 }
+
+string Diamond::typeStr() const
+{
+    return "Diamond";
+}
+
+string Diamond::dataAsCsv() const
+{
+    return "";
+}
+
+/*
+/////////////////////////////////////////////////////////////////
+Obstacle class derived from TileOccupant
+/////////////////////////////////////////////////////////////////
+*/
+
 
 Obstacle::Obstacle(std::string name, int energyCost) : name_(name), 
     energyCost_(energyCost)
 {}
 
-std::string Obstacle::name()
+std::string Obstacle::name() const
 {
     return name_;    
 }
@@ -819,36 +996,32 @@ std::string Obstacle::promptMsg(Hero& theHero)
      * <string> for the below statement to compile.
      */
     return std::string("You must remove a " + name_ + " to continue. Doing"
-    + " so without a tool will consume " + std::to_string(energyCost)
+    + " so without a tool will consume " + std::to_string(energyCost_)
     + " points of energy. Select a tool or press \"space\" for no tool.");
 }
 
-void Obstacle::interact(char promptResponse, Hero& theHero)
+bool Obstacle::interact(char promptResponse, Hero& theHero)
 {
-    std::vector<Tool*> usableTools = theHero.getUsableTools(*this);
+    std::vector<Tool*> usableTools = theHero.getUsableTools(*this); 
+    int toolInd = charToChoiceIndex(promptResponse);
 
-    // Throw exception if promptResponse an impossible value. 
-    if ((promptResponse >= usableTools.size() || promptResponse < 0) && 
-        promptResponse != ' ')
-    {
-        throw std::invalid_argument("Invalid promptResponse: " 
-            + std::to_string(int(promptResponse)) 
-            + " (number of usable tools: "
-            + std::to_string(usableTools.size())
-            + ")");
+    // Check if the promptResponse is invalid.
+    if ((toolInd < 0 && toolInd >= static_cast<int>(usableTools.size())) && 
+        promptResponse != ' ') {
+        return false;
     }
 
     // If a tool was chosen, calculate new energy cost and consume the tool.
     if (promptResponse != ' ')
     {
         // Check if the pointer to the chosen tool is null
-        Tool *chosenTool = usableTools.at(int(promptResponse));
+        Tool *chosenTool = usableTools.at(toolInd);
 
         if (!chosenTool)
             throw std::runtime_error("missing tool");
 
         // Cost is reduced by a factor of the rating, rounding up.
-        energyCost_ /= usableTools.at(int(promptResponse))->rating();
+        energyCost_ /= chosenTool->rating();
         energyCost_++;
 
         // Remove the tool from the Hero's inventory.
@@ -856,6 +1029,7 @@ void Obstacle::interact(char promptResponse, Hero& theHero)
     }
 
     theHero.addEnergy(-energyCost_);
+    return true;
 
     /* Like for any other TileOccupant, the caller will remove this Obstacle
      * from the map after verifying that it is not permanent. Similarly, caller
@@ -863,22 +1037,19 @@ void Obstacle::interact(char promptResponse, Hero& theHero)
      */
 }
 
-bool Obstacle::permanent() override
-{
+bool Obstacle::permanent() {
     return false;
 }
 
-int Obstacle::color() override
-{
+int Obstacle::color() {
     return COLOR_BLACK;
 }
 
-char Obstacle::marker() override
-{
+char Obstacle::marker() {
     return '!';
 }
 
-std::vector<std::string> Obstacle::getDetails() override
+std::vector<std::string> Obstacle::getDetails()
 {
     std::vector<std::string> details;
 
@@ -890,64 +1061,12 @@ std::vector<std::string> Obstacle::getDetails() override
     return details;
 }
 
-Binoculars::Binoculars(int whiffleCost) : whiffleCost_(whiffleCost), 
-    consumed_(false);
-{}
-
-std::string Binoculars::promptMsg(Hero& theHero) override
+string Obstacle::typeStr() const
 {
-    if (theHero.whiffles() < whiffleCost_)
-    {
-        return std::string("You cannot afford these binoculars.")
-    }
-    else
-    {
-        // Price not listed because item details are also included in the 
-        // popup.
-        return std::string("Would you like to buy these binoculars? Press Y"
-            + " to purchase or any other key to not.");
-    }
+    return "Obstacle";
 }
 
-// Gives the Hero binoculars if the user chooses to purchase.
-void Binoculars::interact(char promptResponse, Hero& theHero) override
+string Obstacle::dataAsCsv() const
 {
-    if (theHero.whiffles() < whiffleCost_)
-    {
-        // Regardless of the response, these binoculars were not purchased.
-        return;
-    }
-
-    if (promptResponse == 'y' || promptResponse == 'Y')
-    {
-        theHero.giveBinoculars();
-        theHero.addWhiffles(-whiffleCost_);
-    }
-}
-
-bool Binoculars::permanent() override
-{
-    return !consumed_;
-}
-
-int Binoculars::color() override
-{
-    return COLOR_BLACK;
-}
-
-char Binoculars::marker() override
-{
-    return 'B';
-}
-
-std::vector<std::string> Binoculars::getDetails() override
-{
-    std::vector<std::string> details;
-
-    details.push_back("Binoculars");
-    details.push_back(std::to_string(whiffleCost_));
-    details.push_back("Tool");
-    details.push_back("Price");
-
-    return details;
+    return name_ + "," + to_string(energyCost_);
 }

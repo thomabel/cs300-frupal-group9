@@ -2,30 +2,42 @@
 Hero class header
 November 2020
 */
+
+#ifndef Hero_CLASS
+#define Hero_CLASS
+
 #include <vector>
+#include "Map.h"
+#include "TileOccupant.h"
+  
 using namespace std;
+
+class Obstacle;
+class Tool;
 
 class Hero{
     public:
-    Hero();
-    Hero(const  hero &);
-    vector<tool*> getUsableTools(obstacle);
-    void addInventory(tool *);
-    bool consumeTool(tool *);
-    int visionRange(void) const;
-    bool hasShip(void) const;
-    int whiffles(void) const;
-    int energy(void) const;
-    int addEnergy(int);
-    int addWhiffles(int);
-    void giveBinoculars(void);
-    void giveShip(void);
+      Hero();
+      Hero(const Hero&);
+      vector<Tool*> getUsableTools(Obstacle&);
+      vector<vector<string>> getToolOptions(Obstacle&);
+      void addInventory(Tool *);
+      bool consumeTool(Tool *);
+      int visionRange(void) const;
+      bool hasShip(void) const;
+      int whiffles(void) const;
+      int energy(void) const;
+      int addEnergy(int);
+      int addWhiffles(int);
+      void setHasBinoculars(bool);
+      void setHasShip(bool);
 
     private:
-    vector<tool*> inventory_;
-    bool hasBinoculars_;
-    bool hasShip_;
-    int whiffles_;
-    int energy_;
+      vector<Tool*> inventory_;
+      bool hasBinoculars_;
+      bool hasShip_;
+      int whiffles_;
+      int energy_;
 };
 
+#endif
