@@ -6,6 +6,7 @@
 #ifndef GameState_CLASS
 #define GameState_CLASS
 
+#include <ncurses.h>
 #include"Map.h"
 #include"Hero.h"
 #include"UI.h"

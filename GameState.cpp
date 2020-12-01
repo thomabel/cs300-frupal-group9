@@ -1,4 +1,5 @@
-#include"GameState.h"
+#include "GameState.h"
+#include "TileType.h"
 
 GameState::GameState(): map("Frupal.txt", heroX, heroY)
 {
@@ -9,8 +10,9 @@ GameState::GameState(): map("Frupal.txt", heroX, heroY)
 	
 	//Should start at Hero position
 	cursorX = heroX;
-        cursorY =heroY;
+    cursorY = heroY;
 }
+
 GameState::~GameState()
 {
 	map.saveFile("SavedFile.txt", heroX, heroY);
@@ -29,9 +31,9 @@ void GameState::travel(int & direction, WINDOW * win)
 		if(ExpandMap())
 		{
 			//Clear screen
-			for(int i = 0; i<MaxScreenY; ++i)
+			for(int i = 0; i<map.MaxScreenY; ++i)
 			{
-				for(int j = 0; j<MenuBorder; ++j)
+				for(int j = 0; j<map.MenuBorder; ++j)
 				{
 						attron(COLOR_PAIR(3));
 						mvwprintw(win,i ,j," ");
@@ -79,7 +81,7 @@ bool GameState::HeroTravel(int & direction)
 				{
 					//Move hero up
 					--heroY;
-					temp_type = map.tileTypeAt(heroX+MinX, heroY+MinY);
+					temp_type = map.tileTypeAt(heroX+map.MinX, heroY+map.MinY);
 					//Check if we can enter
 					if(temp_type->canEnter(theHero))
 					{
@@ -107,15 +109,15 @@ bool GameState::HeroTravel(int & direction)
 			break;
 
 		case 'k':
-			if(heroY+1 < MaxScreenY+1)
+			if(heroY+1 < map.MaxScreenY+1)
 			{
-				if(heroY+1 == MaxScreenY)
+				if(heroY+1 == map.MaxScreenY)
                                         ++heroY;
 				else
 				{
 					//Same as above but move down
 					++heroY;
-					temp_type = map.tileTypeAt(heroX+MinX, heroY+MinY);
+					temp_type = map.tileTypeAt(heroX+map.MinX, heroY+map.MinY);
 					if(temp_type->canEnter(theHero))
 					{
 						theHero.addEnergy((temp_type->energyCost() * -1 ));
@@ -136,19 +138,19 @@ bool GameState::HeroTravel(int & direction)
 			
 			}
 			else
-				heroY = MaxScreenY-1;
+				heroY = map.MaxScreenY-1;
 			break;
 
 		case 'l':
-			if(heroX+1 < MenuBorder+1)
+			if(heroX+1 < map.MenuBorder+1)
 			{
-				if(heroX+1 == MenuBorder)
+				if(heroX+1 == map.MenuBorder)
                                         ++heroX;
                                 else
                                 {
 					//Move right
                                         ++heroX;
-                                        temp_type = map.tileTypeAt(heroX+MinX, heroY+MinY);
+                                        temp_type = map.tileTypeAt(heroX+map.MinX, heroY+map.MinY);
                                         if(temp_type->canEnter(theHero))
 					{
 						theHero.addEnergy((temp_type->energyCost() * -1 ));
@@ -170,7 +172,7 @@ bool GameState::HeroTravel(int & direction)
 
 			}
 			else
-				heroX = MenuBorder-1;
+				heroX = map.MenuBorder-1;
 
 			break;
 		case 'j':
@@ -182,7 +184,7 @@ bool GameState::HeroTravel(int & direction)
                                 {
 					//Move left
                                         --heroX;
-                                        temp_type = map.tileTypeAt(heroX+MinX, heroY+MinY);
+                                        temp_type = map.tileTypeAt(heroX+map.MinX, heroY+map.MinY);
                                         if(temp_type->canEnter(theHero))
 					{
 						theHero.addEnergy((temp_type->energyCost() * -1 ));
@@ -220,8 +222,8 @@ bool GameState::occupantCheck(int &direction) {
   /* "Row" does not correspond to the horizontal axis, so this is questionable
    * at best.
    */
-  int r = heroX + MinX;
-  int c = heroY + MinY;
+  int r = heroX + map.MinX;
+  int c = heroY + map.MinY;
   TileType *tileType = map.tileTypeAt(r, c);
   TileOccupant *occ = map.occupantAt(r, c);
 
@@ -304,8 +306,8 @@ void GameState::HeroVision() {
 // How much the hero can see on his journey
 void GameState::HeroVision(int tempHeroY, int tempHeroX) {
 
-  if ((tempHeroY < MaxScreenY && tempHeroY >= 0) &&
-      (tempHeroX < MenuBorder && tempHeroX >= 0)) {
+  if ((tempHeroY < map.MaxScreenY && tempHeroY >= 0) &&
+      (tempHeroX < map.MenuBorder && tempHeroX >= 0)) {
     // This is for the hero later on don't need to worry about it now
     int checkJ = tempHeroX - 1;
     int checkI = tempHeroY;
@@ -330,11 +332,11 @@ void GameState::HeroVision(int tempHeroY, int tempHeroX) {
         checkJ = j;
       }
       // Don't go outside the boundries of array
-      if ((checkI >= 0 && checkI < MaxScreenY) &&
-          (checkJ >= 0 && checkJ < MenuBorder)) {
+      if ((checkI >= 0 && checkI < map.MaxScreenY) &&
+          (checkJ >= 0 && checkJ < map.MenuBorder)) {
         // Tile is discovered, set it to true
-        map.tile_revealed(checkI + MinY, checkJ + MinX);
-        // array[checkI+MinY][checkJ+MinX].used = true;
+        map.tile_revealed(checkI + map.MinY, checkJ + map.MinX);
+        // array[checkI+map.MinY][checkJ+map.MinX].used = true;
       }
       if (k == 6)
         // check down
@@ -369,19 +371,19 @@ void GameState::cursorTravel(int direction)
                         break;
 
                 case 'd':
-                        if(cursorY+1 < MaxScreenY)
+                        if(cursorY+1 < map.MaxScreenY)
                                 ++cursorY;
                         else
-                                cursorY = MaxScreenY-1;
+                                cursorY = map.MaxScreenY-1;
 
                         break;
 
 
                 case 'f':
-                        if(cursorX+1 < MenuBorder)
+                        if(cursorX+1 < map.MenuBorder)
                                 ++cursorX;
                         else
-                                cursorX = MenuBorder-1;
+                                cursorX = map.MenuBorder-1;
                         break;
 
                 case 's':
@@ -394,9 +396,9 @@ void GameState::cursorTravel(int direction)
 	}
 	//Pass in tileType and Occupant to inspect 
 
-	if(map.isTileDiscovered(cursorX+MinX, cursorY+MinY)){ 
-		temp_type= map.tileTypeAt(cursorX+MinX, cursorY+MinY);
-		occupant_temp = map.occupantAt(cursorX+MinX, cursorY+MinY);
+	if(map.isTileDiscovered(cursorX+map.MinX, cursorY+map.MinY)){ 
+		temp_type= map.tileTypeAt(cursorX+map.MinX, cursorY+map.MinY);
+		occupant_temp = map.occupantAt(cursorX+map.MinX, cursorY+map.MinY);
 
 		if(occupant_temp){
 			details = occupant_temp->getDetails();
@@ -428,24 +430,24 @@ bool GameState::ExpandMap() {
   int temp;
 
   // Explore down the map
-  if (heroY == MaxScreenY) {
+  if (heroY == map.MaxScreenY) {
     --heroY;
 
-    temp = heroY + MinY;
+    temp = heroY + map.MinY;
 
-    MinY = MaxY - (MaxScreenY / 2);
-    MaxY = MaxY + (MaxScreenY / 2);
+    map.MinY = map.MaxY - (map.MaxScreenY / 2);
+    map.MaxY = map.MaxY + (map.MaxScreenY / 2);
 
     // Account for ODD #
-    if (MaxY - MinY < MaxScreenY)
-      ++MaxY;
+    if (map.MaxY - map.MinY < map.MaxScreenY)
+      ++map.MaxY;
 
-    if (MaxY > (MAPSIZE - 1)) {
-      MaxY = MAPSIZE;
-      MinY = MAPSIZE - MaxScreenY;
+    if (map.MaxY > (map.MAPSIZE - 1)) {
+      map.MaxY = map.MAPSIZE;
+      map.MinY = map.MAPSIZE - map.MaxScreenY;
     }
 
-    heroY = abs((temp - MinY));
+    heroY = abs((temp - map.MinY));
     heroX = heroX;
     return true;
 
@@ -453,41 +455,41 @@ bool GameState::ExpandMap() {
   // Go back up
   else if (heroY == -1) {
     ++heroY;
-    temp = heroY + MinY;
+    temp = heroY + map.MinY;
 
-    MinY -= (MaxScreenY / 2);
-    MaxY -= (MaxScreenY / 2);
+    map.MinY -= (map.MaxScreenY / 2);
+    map.MaxY -= (map.MaxScreenY / 2);
 
-    if (MinY <= -1) {
-      MaxY = MaxScreenY;
-      MinY = 0;
+    if (map.MinY <= -1) {
+      map.MaxY = map.MaxScreenY;
+      map.MinY = 0;
     }
 
-    heroY = abs((temp - MinY));
+    heroY = abs((temp - map.MinY));
     heroX = heroX;
     return true;
 
   }
 
   // Explore right
-  else if (heroX == MenuBorder) {
+  else if (heroX == map.MenuBorder) {
     --heroX;
 
-    temp = heroX + MinX;
+    temp = heroX + map.MinX;
 
-    MinX = MaxX - (MenuBorder / 2);
-    MaxX = MaxX + (MenuBorder / 2);
+    map.MinX = map.MaxX - (map.MenuBorder / 2);
+    map.MaxX = map.MaxX + (map.MenuBorder / 2);
 
     // Account for ODD #
-    if (MaxX - MinX < MenuBorder)
-      ++MaxX;
+    if (map.MaxX - map.MinX < map.MenuBorder)
+      ++map.MaxX;
 
-    if (MaxX > (MAPSIZE - 1)) {
-      MaxX = MAPSIZE;
-      MinX = MAPSIZE - MenuBorder;
+    if (map.MaxX > (map.MAPSIZE - 1)) {
+      map.MaxX = map.MAPSIZE;
+      map.MinX = map.MAPSIZE - map.MenuBorder;
     }
 
-    heroX = abs(temp - MinX);
+    heroX = abs(temp - map.MinX);
     heroY = heroY;
     return true;
   }
@@ -496,19 +498,19 @@ bool GameState::ExpandMap() {
   else if (heroX == -1) {
     ++heroX;
 
-    if (MinX != 0) {
+    if (map.MinX != 0) {
 
-      temp = heroX + MinX;
+      temp = heroX + map.MinX;
 
-      MinX -= (MenuBorder / 2);
-      MaxX -= (MenuBorder / 2);
+      map.MinX -= (map.MenuBorder / 2);
+      map.MaxX -= (map.MenuBorder / 2);
 
-      if (MinX <= -1) {
-        MaxX = MenuBorder;
-        MinX = 0;
+      if (map.MinX <= -1) {
+        map.MaxX = map.MenuBorder;
+        map.MinX = 0;
       }
 
-      heroX = abs(temp - MinX);
+      heroX = abs(temp - map.MinX);
       heroY = heroY;
       return true;
     }

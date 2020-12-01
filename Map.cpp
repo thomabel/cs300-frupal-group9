@@ -1,3 +1,5 @@
+#include "TileType.h"
+#include "TileOccupant.h"
 #include "Map.h"
 #include "CsvToOccupant.h"
 #include <stdexcept>
@@ -15,10 +17,26 @@ Tile::~Tile()
 
 Map::Map(string srcFile, int & heroX, int & heroY)
 {
+    MaxScreenY = 0; //LINES
+
+    //The max we can go on the screen
+    MenuBorder = 0; // MaxScreenX for frupal Map
+    
+    getmaxyx(stdscr,MaxY,MaxX);
+    
+    MinX = 0;
+    MinY = 0;
+
 	if(!(loadFile(srcFile, heroX, heroY)))
 	{
 		throw runtime_error("File cannot open");
 	}
+
+    for (int i = 0; i < MAPSIZE; ++i) {
+        for (int j = 0; j < MAPSIZE; ++j) {
+            tileArray[i][j] = Tile();
+        } 
+    }
 }
 
 //Read in the map
