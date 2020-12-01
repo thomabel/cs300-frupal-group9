@@ -1,6 +1,6 @@
 #include "UI.h"
 
-bool UserInterface::initialize(){
+bool UserInterface::initialize(unsigned int width){
     // Sets up the UI. Returns false if the screen is the wrong size.
 	int scrY, scrX;
     int xp;
@@ -12,7 +12,7 @@ bool UserInterface::initialize(){
 		return false;
 
 	//xp = scrX * 3 / 10;
-    xp = WIDTH;
+    xp = width;
 	y = scrY;
     x = xp;
     yl = 0;
@@ -23,24 +23,25 @@ bool UserInterface::initialize(){
 	bmain = newwin(y, x, yl, xl);
 
 // These are the side windows.
-    y -= 4;
+    y -= 2;
     x -= 4;
-    yl += 2; 
+    yl += 1; 
     xl += 2;
     info = newwin(y, x, yl, xl);
     inven = newwin(y, x, yl, xl);
 
 // Popup window border.
-    y = scrY / 2;
-    x = (scrX - xp) / 2;
+    float factor = 1.5;
+    y = scrY / factor;
+    x = (scrX - xp) / factor;
     yl = (scrY - y) / 2;
-    xl = (scrX - x) / 2;
+    xl = (scrX - xp - x) / 2;
     bpop = newwin(y, x, yl, xl);
 
 // Popup window.
-    y -= 4;
+    y -= 2;
     x -= 4;
-    yl += 2;
+    yl += 1;
     xl += 2;
     pop = newwin(y, x, yl, xl);
 
@@ -85,7 +86,7 @@ void UserInterface::actions(
 void UserInterface::tileInspect(
     std::vector<std::string> values){
     // Prints the information of a grovenik and its occupant.
-    int ypos = getmaxy(info) / 2;
+    int ypos = getmaxy(info) / 2 - 2;
     int xoffset = -1;
     printTitle(info, ypos, xoffset, LABEL_Inspect);
     printDualCol(info, ++ypos, xoffset, values);
@@ -94,40 +95,71 @@ void UserInterface::tileInspect(
 
 void UserInterface::whifflesEnergy(int whiffles, int energy){
     // Prints the number of whiffles and energy of the hero.
-    std::vector<std::string> values = 
-    {std::to_string(whiffles), std::to_string(energy),
-    LABEL_Whiffles, LABEL_Energy};
-    int ypos = getmaxy(info) - 2;
-    int xoffset = 0;
+    std::vector<std::string> values;
+    int ypos, xoffset;
+
+    values = {
+    std::to_string(whiffles), 
+    std::to_string(energy),
+    LABEL_Whiffles, 
+    LABEL_Energy};
+    ypos = getmaxy(info) - 3;
+    xoffset = 0;
+
     printDualCol(info, ypos, xoffset, values);
     return;
 }
 
-void UserInterface::displayInventory(
-    std::vector<std::vector<std::string>> tools){
+char UserInterface::displayInventory(
+    std::vector<std::vector<std::string>> tools,
+    bool getInput){
     char ch;
-    int maxy, y;
+    int ist;
+    int y, cy, cx;
     int ts;
 
     show_panel(pinven);
+    werase(inven);
 
-    maxy = getmaxy(inven);
-    y = 0;
+    ist = 0;
+    y = getmaxy(inven);
+    cy = 0;
     ts = tools.size();
 
-    // Go through all tools.
-    for (int i = 0; i < ts; i++){
-        // Go through each line in tool.
-        
-    }
-
-    while (ch != 'q'){
+    do {
+        // Print all the tools.
+        werase(inven);
+        for (int i = ist; i < ts; i++){
+            printDualCol(inven, cy, 0, tools[i]);
+            getyx(inven, cy, cx);
+            cy += 2;
+            if (cy > y)
+                break;
+        }
+        cy = 0;
         ch = getch();
-        
-    }
+
+        // Scroll upwards.
+        if (ch == CTRL_UP){
+            ist -= 1;
+            if (ist < 0)
+                ist = 0;
+        }
+        // Scroll downwards.
+        else if (ch == CTRL_DOWN){
+            ist += 1;
+            if (ist >= ts)
+                ist = ts - 1; 
+        }
+        else if (getInput && ch != CTRL_INV){
+            break;
+        }
+    } while (ch != CTRL_INV);
 
     hide_panel(pinven);
-    return;
+    update_panels();
+    doupdate();
+    return ch;
 }
 
 // Popup
@@ -137,15 +169,11 @@ char UserInterface::popup(std::string msg){
     show_panel(pbpop);
     show_panel(ppop);
     
-    // Add the string.
+    // Add the string, get input.
     werase(pop);
     mvwaddstr(pop, 0, 0, msg.data());
-
-    // Refresh the image.
-    update_panels();
-    doupdate();
-    // Wait for input.
     ch = getch();
+
     // Hide popup when finished.
     hide_panel(pbpop);
     hide_panel(ppop);
@@ -158,18 +186,19 @@ char UserInterface::popup(std::string msg){
 char UserInterface::popup(std::string msg,
     std::vector<std::string> values){
     char ch;
+    int ypos;
     // Activate the panels that the popup is on.
     show_panel(pbpop);
     show_panel(ppop);
+
     // Add the string.
     werase(pop);
     mvwaddstr(pop, 0, 0, msg.data());
-    printDualCol(pop, getmaxy(pop) - 4, 0, values);
-    // Refresh the image.
-    update_panels();
-    doupdate();
+    ypos = getmaxy(pop) - values.size() / 2 - 1;
+    printDualCol(pop, ypos, 0, values);
     // Wait for input.
     ch = getch();
+
     // Hide the popup when finished.
     hide_panel(pbpop);
     hide_panel(ppop);
@@ -177,6 +206,33 @@ char UserInterface::popup(std::string msg,
     doupdate();
 
     return ch;
+}
+
+char UserInterface::popup(std::string message,
+        std::vector<std::string> obstacle,
+        std::vector<std::vector<std::string>> tools){
+    char ch;
+    int ypos;
+
+    // Activate the panels that the popup is on.
+    show_panel(pbpop);
+    show_panel(ppop);
+
+    // Display popup text.
+    werase(pop);
+    mvwaddstr(pop, 0, 0, message.data());
+    ypos = getmaxy(pop) - obstacle.size() / 2 - 1;
+    printDualCol(pop, ypos, 0, obstacle);
+    // Display inventory and get input.
+    ch = displayInventory(tools, true);
+
+    // Hide the popup when finished.
+    hide_panel(pbpop);
+    hide_panel(ppop);
+    update_panels();
+    doupdate();
+
+    return ch; 
 }
 
 // Prints a title string in the center of a window.
@@ -215,9 +271,10 @@ void UserInterface::printDualCol(
         mvwaddstr(win, ypos + i, start, str.data());
         // If string is too wide, update ypos.
         int s = str.length();
-        while (s > WIDTH){
+        int w = getmaxx(win);
+        while (s > w){
             ypos++;
-            s -= WIDTH;
+            s -= w;
         }
     }
     update_panels();
