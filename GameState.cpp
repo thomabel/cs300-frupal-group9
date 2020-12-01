@@ -212,17 +212,17 @@ bool GameState::HeroTravel(int & direction)
 
 	}
 	return true;
-
+}
 
 // What occupies the tile
-bool GameState::occupantCheck(int &direction, WINDOW *win) {
+bool GameState::occupantCheck(int &direction) {
   
   /* "Row" does not correspond to the horizontal axis, so this is questionable
    * at best.
    */
   int r = heroX + MinX;
   int c = heroY + MinY;
-  TileType *tileType = map.tileAt(r, c);
+  TileType *tileType = map.tileTypeAt(r, c);
   TileOccupant *occ = map.occupantAt(r, c);
 
   // Not NULL, we have an occupant
@@ -235,7 +235,7 @@ bool GameState::occupantCheck(int &direction, WINDOW *win) {
        * TileOccupant::promptMsg() will give an appropriate message if
        * the user cannot afford an item.
        */
-      response = UI.popup(occ->promptMsg(), occ->getDetails());
+      response = UI.popup(occ->promptMsg(theHero), occ->getDetails());
 
       // If encountering an Obstacle, the user needs to see their tool choices.
       if (occ->typeStr() == "Obstacle") {
@@ -243,12 +243,12 @@ bool GameState::occupantCheck(int &direction, WINDOW *win) {
         UI.displayInventory(theHero.getToolOptions(*o));
       }
       
-    } while (!occ->interact(response, theHero);
+    } while (!occ->interact(response, theHero));
     
     /* End the game if the Hero is out of energy. The user has been
      * notified via pop-up already.
      */
-    if (theHero.energy <= 0) {
+    if (theHero.energy() <= 0) {
       direction = 'q';
       return false;
     }
@@ -275,7 +275,7 @@ bool GameState::occupantCheck(int &direction, WINDOW *win) {
    * Since this ship was already purchased, it has no cost.
    */
   if (theHero.hasShip() && tileType->toString() != "Water") {
-      map.setOccupantAt(r, c, new Ship(0, true))
+      map.setOccupantAt(r, c, new Ship(0, true));
       theHero.setHasShip(false);
   }
 

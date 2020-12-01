@@ -1,5 +1,6 @@
 #include "Map.h"
 #include "CsvToOccupant.h"
+#include <stdexcept>
 
 Tile::Tile() : revealed(false), type(0), occupant(0)
 {}
@@ -16,12 +17,12 @@ Map::Map(string srcFile, int & heroX, int & heroY)
 {
 	if(!(loadFile(srcFile, heroX, heroY)))
 	{
-		cout<<"File cannot open"<<endl;
+		throw runtime_error("File cannot open");
 	}
 }
 
 //Read in the map
-bool Map::loadFile(string src, int & heroX, int & heroY);
+bool Map::loadFile(string src, int & heroX, int & heroY)
 {
 
         string temp;
@@ -128,7 +129,9 @@ bool Map::loadFile(string src, int & heroX, int & heroY);
 bool Map::loadOccupants(string src) {
   string temp;
 
-  ifstream fin(src);
+  ifstream fin;
+
+  fin.open(src);
 
   if (fin) {
     getline(fin, temp);
@@ -157,8 +160,10 @@ bool Map::loadOccupants(string src) {
         return false;
 
       // If the tile already has an occupant, remove it.
-      if (tileArray[row][col] != 0)
-        delete tileArray[row][col];
+     
+      // TODO: IDEALLY MAKE THIS WORK
+      //if (tileArray[row][col].occupant != 0)
+      //  delete tileArray[row][col].occupant;
 
       tileArray[row][col].occupant = newOccupant(type, temp);
     }
@@ -167,6 +172,7 @@ bool Map::loadOccupants(string src) {
   }
 
   return true;
+}
 
 bool Map::saveFile(string dest, int heroX, int heroY)
 {
@@ -229,9 +235,9 @@ bool Map::saveOccupants(string dest) {
   if (fout) {
     fout << occupants.size() << "\n";
 
-    for (int i = 0; i < occupants.size(); ++i) {
+    for (unsigned int i = 0; i < occupants.size(); ++i) {
       fout << "\n"
-           << rows[i] << "," cols[i] << "\n"
+           << rows[i] << "," << cols[i] << "\n"
            << occupants[i]->typeStr() << "\n"
            << occupants[i]->dataAsCsv() << "\n";
     }
@@ -255,7 +261,7 @@ void Map::tile_revealed(int row, int col) {
 }
 
 // Remove a tileOccupant, typicaly after it is bought/consumed/looted
-void setOccupantAt(int row, int col, TileOccupant* newOccupant) {
+void Map::setOccupantAt(int row, int col, TileOccupant* newOccupant) {
     TileOccupant *& temp = tileArray[row][col].occupant;
 
     if (temp)
@@ -274,23 +280,23 @@ bool Map::isTileDiscovered(int row, int col) {
 
 // Display what is discovered
 void Map::displayMap(WINDOW *win) {
-  char MarkerDisplay;
+  string MarkerDisplay;
   // Print the Grovnicks that are used
   for (int i = MinY; i < MaxY; ++i) {
     for (int j = MinX; j < MaxX; ++j) {
       if (tileArray[i][j].revealed) {
         if (tileArray[i][j].occupant)
-          MarkerDisplay = tileArray[i][j].occupant->marker();
+          MarkerDisplay = string(1, tileArray[i][j].occupant->marker());
         else
           MarkerDisplay = " ";
 
         if (tileArray[i][j].occupant != NULL &&
-            tileArray[i][j].occupant == Diamond) {
+            tileArray[i][j].occupant->typeStr() == "Diamond") {
           attron(COLOR_PAIR(1));
-          mvwprintw(win, i - MinY, j - MinX, MarkerDisplay);
+          mvwprintw(win, i - MinY, j - MinX, MarkerDisplay.data());
         } else {
           attron(COLOR_PAIR(tileArray[i][j].type->color()));
-          mvwprintw(win, i - MinY, j - MinX, MarkerDisplay);
+          mvwprintw(win, i - MinY, j - MinX, MarkerDisplay.data());
         }
       }
     }

@@ -3,40 +3,44 @@
  Author: Mohamed-Amin Cheaito
  November 2020
 */
-/*
+
+using namespace std;
+
+#ifndef Map_CLASS
+#define Map_CLASS
+
 #include<ncurses.h>
 #include<vector>
 #include<cstring>
 #include <string>
 #include <cmath>
-        
 #include<fstream>
 #include<iostream>
-using namespace std;
-*/
-
-#ifndef Map_CLASS
-#define Map_CLASS
 
 #include "TileType.h"
-#include"TileOccupant.h"
+#include "TileOccupant.h"
 
+class TileOccupant;
+class TileType;
+
+//Screen size
+int MaxScreenX = 0; //COLS
+
+int MaxScreenY = 0; //LINES
+
+//The max we can go on the screen
+int MenuBorder = 0; // MaxScreenX for frupal Map
 
 const int MAPSIZE = 128;
+int MaxX = 0;
+int MaxY = 0;
+int MinX = 0;
+int MinY = 0;
 
 struct Tile
 {
 	Tile();
 	~Tile();
-
-	bool revealed;
-	TileType* type;
-	TileOccupant* occupant;
-};
-
-struct Tile
-{
-	Tile();
 
 	bool revealed;
 	TileType* type;

@@ -134,7 +134,7 @@ Return:		string - message to display to player
 */
 string Treasure::promptMsg(Hero& theHero)
 {
-	string msg = "A treasure chest has been found " 
+	string msg = string("A treasure chest has been found ")
 			+ "containing: " + to_string(worth_) 
 			+ " Whiffles!";
 	return msg;
@@ -286,7 +286,9 @@ bool Ship::interact(char promptResponse, Hero& theHero)
 		return true;
 
     if (!TileOccupant::interact(promptResponse, theHero))
+    {
         return false;
+    }
 
 	if(promptResponse == 'y' || promptResponse == 'Y')
 	{
@@ -305,7 +307,7 @@ string Ship::typeStr() const
 
 string Ship::dataAsCsv() const
 {
-    retrn to_string(whiffleCost_);
+    return to_string(whiffleCost_);
 }
 
 /*
@@ -319,7 +321,7 @@ Tool::Tool() : name_(0), whiffleCost_(0), rating_(0), forObstacles(0),
 {
 }
 
-Tool(const Tool& toCopy) : name_(toCopy.name_), whiffleCost_(toCopy.
+Tool::Tool(const Tool& toCopy) : name_(toCopy.name_), whiffleCost_(toCopy.
     whiffleCost_), rating_(toCopy.rating_), forObstacles(toCopy.forObstacles), 
     bought_(toCopy.bought_)
 {
@@ -327,7 +329,7 @@ Tool(const Tool& toCopy) : name_(toCopy.name_), whiffleCost_(toCopy.
 
 Tool::Tool(string name, int whiffleCost, int rating, vector<string> usableOn) 
     : name_(name), whiffleCost_(whiffleCost), rating_(rating)
-    , forObstacles(obst), bought_(false)
+    , forObstacles(usableOn), bought_(false)
 {
 }
 
@@ -338,10 +340,10 @@ Arguments:	Obstacle& - obstacle to check against
 Return:		bool - true if usable on obstacle, 
 			false if not
 */
-bool Tool::usableOn(const Obstacle& onObstacle)
+bool Tool::usableOn(const Obstacle& onObstacle) const
 {
-	vector<string>::iterator i;
-	for(i=forObstacles.begin(); i<forObstacles.end(); i++)
+	//vector<string>::iterator i;
+	for(auto i=forObstacles.cbegin(); i<forObstacles.cend(); i++)
 	{
 		if(*i == onObstacle.name())
 			return true;
@@ -402,8 +404,6 @@ Return:		vector<string> - object data to pass to ui
 */
 vector<string> Tool::getDetails()
 {
-	int obstacleCount;
-
 	vector<string> data;
 	// push name of tool to vector
 	data.push_back(name_);
@@ -445,10 +445,10 @@ string Tool::promptMsg(Hero& theHero)
 	{
 		msg = msg + name_ + "\n";
 		// get all obstacles tool works for
-		for (vector<string>::iterator it = forObstacles.begin()
+		for (auto it = forObstacles.begin()
 			; it != forObstacles.end(); ++it)
 		{
-			msg = msg + *it.name() + " : Obstacle\n";
+			msg = msg + (*it) + " : Obstacle\n";
 		}
 		
 		// get tool cost and rating
@@ -474,11 +474,13 @@ Return:		none
 */
 bool Tool::interact(char promptResponse, Hero& theHero)
 {
-	if(theHero.whiffles() < whiffleCost_)
+	if(theHero.whiffles() < whiffleCost_) {
 		return true;
+    }
 	
-  if (!TileOccupant::interact(promptResponse, theHero))
-    return false;
+    if (!TileOccupant::interact(promptResponse, theHero)) {
+        return false;
+    }
 
 	switch(promptResponse)
 	{
@@ -492,7 +494,7 @@ bool Tool::interact(char promptResponse, Hero& theHero)
 			return true;
 	}
 
-    true;
+    return true;
 }
 
 string Tool::typeStr() const
@@ -505,7 +507,7 @@ string Tool::dataAsCsv() const
     string ret = name_ + "," + to_string(whiffleCost_) + "," + 
         to_string(rating_) + "," +  to_string(forObstacles.size());
 
-    for (int i = 0; i < forObstacles.size(); ++i)
+    for (unsigned int i = 0; i < forObstacles.size(); ++i)
     {
         ret += "," + forObstacles.at(i);
     }
@@ -526,7 +528,7 @@ Food::Food(): name_(0), whiffleCost_(0), energyProvided_(0),
 
 Food::Food(string name, int whiffleCost, int energyProvided)
 	: name_(name), whiffleCost_(whiffleCost)
-	, energyProvided_(energyProvided), consumed(false)
+	, energyProvided_(energyProvided), consumed_(false)
 {
 }
 
@@ -620,11 +622,13 @@ Return:		string - message to display
 */
 bool Food::interact(char promptResponse, Hero& theHero)
 {
-	if(theHero.whiffles() < whiffleCost_)
+	if(theHero.whiffles() < whiffleCost_) {
 		return true;
+    }
 
-    if (!TileOccupant::interact(promptResponse, theHero))
+    if (!TileOccupant::interact(promptResponse, theHero)) {
         return false;
+    }
 
 	switch(promptResponse)
 	{
@@ -663,7 +667,7 @@ Binoculars::Binoculars(): whiffleCost_(0), bought_(false)
 }
 
 Binoculars::Binoculars(int whiffleCost): whiffleCost_(whiffleCost),
-    bought(false)
+    bought_(false)
 {
 }
 
@@ -706,16 +710,9 @@ Description:	gets data to send to ui
 Arguments:	none
 Return:		vector<string> - data strings for ui
 */
-std::vector<std::string> Binoculars::getDetails() override
+std::vector<std::string> Binoculars::getDetails()
 {
-	vector<string> data;
-  
-	data.push_back("");
-  details.push_back(std::to_string(whiffleCost_));
-	data.push_back("Binoculars");
-  details.push_back("Price");
-	
-	return data;
+	return vector<string>{"", to_string(whiffleCost_), "Binoculars", "Price"};
 }
 
 /*
@@ -752,11 +749,13 @@ Return:		string - message to display
 */
 bool Binoculars::interact(char promptResponse, Hero& theHero)
 {
-	if(theHero.whiffles() < whiffleCost_)
+	if(theHero.whiffles() < whiffleCost_) {
 		return true;
+    }
 
-    if (!TileOccupant::interact(promptResponse, theHero))
+    if (!TileOccupant::interact(promptResponse, theHero)) {
         return false;
+    }
 
 	switch(promptResponse)
 	{
@@ -986,7 +985,7 @@ Obstacle::Obstacle(std::string name, int energyCost) : name_(name),
     energyCost_(energyCost)
 {}
 
-std::string Obstacle::name()
+std::string Obstacle::name() const
 {
     return name_;    
 }
@@ -997,7 +996,7 @@ std::string Obstacle::promptMsg(Hero& theHero)
      * <string> for the below statement to compile.
      */
     return std::string("You must remove a " + name_ + " to continue. Doing"
-    + " so without a tool will consume " + std::to_string(energyCost)
+    + " so without a tool will consume " + std::to_string(energyCost_)
     + " points of energy. Select a tool or press \"space\" for no tool.");
 }
 
@@ -1007,8 +1006,10 @@ bool Obstacle::interact(char promptResponse, Hero& theHero)
     int toolInd = charToChoiceIndex(promptResponse);
 
     // Check if the promptResponse is invalid.
-    if ((toolInd < 0 && toolInd >= usableTools.size()) && promptResponse != ' ')
+    if ((toolInd < 0 && toolInd >= static_cast<int>(usableTools.size())) && 
+        promptResponse != ' ') {
         return false;
+    }
 
     // If a tool was chosen, calculate new energy cost and consume the tool.
     if (promptResponse != ' ')
@@ -1036,22 +1037,19 @@ bool Obstacle::interact(char promptResponse, Hero& theHero)
      */
 }
 
-bool Obstacle::permanent() override
-{
+bool Obstacle::permanent() {
     return false;
 }
 
-int Obstacle::color() override
-{
+int Obstacle::color() {
     return COLOR_BLACK;
 }
 
-char Obstacle::marker() override
-{
+char Obstacle::marker() {
     return '!';
 }
 
-std::vector<std::string> Obstacle::getDetails() override
+std::vector<std::string> Obstacle::getDetails()
 {
     std::vector<std::string> details;
 

@@ -9,20 +9,8 @@
 #include"Map.h"
 #include"Hero.h"
 #include"UI.h"
-//Screen size
-int MaxScreenX = 0; //COLS
-
-
-int MaxScreenY = 0; //LINES
-
-//The max we can go on the screen
-int MenuBorder = 0; // MaxScreenX for frupal Map
 
 //Map coordinates (within array)
-int MaxX= 0;
-int MaxY = 0;
-int MinX = 0;
-int MinY = 0;
 
 class GameState
 {
