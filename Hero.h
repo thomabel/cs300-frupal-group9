@@ -9,14 +9,16 @@ November 2020
 #include <vector>
 #include "Map.h"
 #include "TileOccupant.h"
-#include <vector>
   
 using namespace std;
+
+class Obstacle;
+class Tool;
 
 class Hero{
     public:
       Hero();
-      Hero(const  hero &);
+      Hero(const Hero&);
       vector<Tool*> getUsableTools(Obstacle&);
       vector<vector<string>> getToolOptions(Obstacle&);
       void addInventory(Tool *);
@@ -37,3 +39,5 @@ class Hero{
       int whiffles_;
       int energy_;
 };
+
+#endif

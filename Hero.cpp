@@ -26,7 +26,7 @@ vector<Tool*> Hero::getUsableTools(Obstacle &current){
     vector<Tool*> usableTools_;
  
     for(auto i = inventory_.cbegin(); i != inventory_.cend(); ++i){
-        if(i->usableOn(current)){
+        if((*i)->usableOn(current)){
         usableTools_.push_back(*i);
         }
     }
@@ -38,7 +38,7 @@ vector<vector<string>> Hero::getToolOptions(Obstacle &current) {
     vector<Tool*> tools = getUsableTools(current);
     vector<vector<string>> options;
 
-    for (int i = 0; i < tools.size(); ++i) {
+    for (unsigned int i = 0; i < tools.size(); ++i) {
         // Get the details of the 
         vector<string> details = tools.at(i)->getDetails();
 

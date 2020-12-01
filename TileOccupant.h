@@ -15,6 +15,8 @@ Description:
 #include <stdexcept>
 #include "Hero.h"
 
+class Hero;
+
 using namespace std;
 
 // Used by Obstacle to validate user choice of tool
@@ -74,14 +76,35 @@ class Ship: public TileOccupant
 		bool bought_;
 };
 
+class Obstacle : public TileOccupant
+{
+public:
+    Obstacle() = delete;
+    Obstacle(string name, int energyCost);
+
+    string name() const;
+    string promptMsg(Hero& theHero) override;
+    bool interact(char promptResponse, Hero& theHero) override;
+    bool permanent() override;
+    int color() override;
+    char marker() override;
+    vector<string> getDetails() override;
+    string typeStr() const override;
+    string dataAsCsv() const override;
+
+private:
+    string name_;
+    int energyCost_;
+};
+
 class Tool: public TileOccupant
 {
 	public:
 		Tool();
         Tool(const Tool& obj);
 		Tool(string name, int whiffleCost, int rating, vector<string> obst);
-		bool usableOn(const Obstacle& onObstacle) override;
-		int rating() override;
+		bool usableOn(const Obstacle& onObstacle) const;
+		int rating();
 		bool permanent() override;
 		int color() override;
 		char marker() override;
@@ -92,10 +115,10 @@ class Tool: public TileOccupant
         string dataAsCsv() const override;
 	protected:
 		string name_;
-	    bool bought_;	
         int whiffleCost_;
 		int rating_;
 		vector<string> forObstacles;
+	    bool bought_;	
 };
 
 class Food: public TileOccupant
@@ -113,9 +136,9 @@ class Food: public TileOccupant
         string dataAsCsv() const override;
 	protected:
 		string name_;
-        bool consumed_;
 		int whiffleCost_;
 		int energyProvided_;
+        bool consumed_;
 };
 
 class Clue: public TileOccupant
@@ -150,41 +173,24 @@ class Diamond: public TileOccupant
 	protected:
 };
 
-class Obstacle : public TileOccupant
-{
-public:
-    Obstacle() = delete;
-    Obstacle(std::string name, int energyCost);
-
-    string name() const;
-    std::string promptMsg(Hero& theHero) override;
-    bool interact(char promptResponse, Hero& theHero) override;
-    bool permanent() override;
-    int color() override;
-    char marker() override;
-    std::vector<std::string> getDetails() override;
-
-private:
-    std::string name_;
-    int energyCost_;
-};
-
 class Binoculars : public TileOccupant
 {
 public:
-    Binoculars() = delete;
+    Binoculars();
     Binoculars(int whiffleCost);
 
-    std::string promptMsg(Hero& theHero) override;
+    string promptMsg(Hero& theHero) override;
     bool interact(char promptResponse, Hero& theHero) override;
     bool permanent() override;
     int color() override;
     char marker() override;
-    std::vector<std::string> getDetails() override;
+    vector<string> getDetails() override;
     string typeStr() const override;
     string dataAsCsv() const override;
 
 private:
-    bool bought_;
     int whiffleCost_;
+    bool bought_;
 };
+
+#endif

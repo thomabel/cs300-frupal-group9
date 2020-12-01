@@ -4,6 +4,8 @@
 #include <string>
 #include "Hero.h"
 
+class Hero;
+
 class TileType
 {
 public:
