@@ -1,51 +1,22 @@
 #include "GameState.h"
 #include "TileType.h"
 
-GameState::GameState(): map("Frupal.txt", heroX, heroY)
-{
-	//string MapsrcFile = "Frupal.txt";
-	//Where should the player start?
-	//heroX =0;
-        //heroY =0;
-	
-	//Should start at Hero position
-	//cursorX = heroX;
-	//cursorY = heroY;
-	UI.initialize(map.MenuBorder);
-	message = {"E", "S", "D", "F", "H",
-    "NORTH", "WEST", "SOUTH", "EAST", "INVENTORY"};
-	while(map.MaxX <= heroX)
-        {       
-                map.MinX = map.MaxX - (map.MenuBorder / 2);
-                map.MaxX = map.MaxX + (map.MenuBorder / 2);
-                if (map.MaxX > (map.MAPSIZE - 1)) {
-                        map.MaxX = map.MAPSIZE;
-                        map.MinX = map.MAPSIZE - map.MenuBorder;
-                }
-        }
-        while(map.MaxY <= heroY)
-        {       
-                map.MinY = map.MaxY - (map.MaxScreenY/ 2);
-                map.MaxY = map.MaxY + (map.MaxScreenY/ 2);
+GameState::GameState(string mapFile) : map(mapFile, heroX, heroY) {
+  // string MapsrcFile = "Frupal.txt";
+  // Where should the player start?
+  // heroX =0;
+  // heroY =0;
 
-		if (map.MaxY > (map.MAPSIZE - 1)) {
-			map.MaxY = map.MAPSIZE;
-			map.MinY = map.MAPSIZE - map.MaxScreenY;
-		}
-                
-        }
+  // Should start at Hero position
+  cursorX = heroX;
 
-	heroX = abs(heroX - map.MinX);
-	heroY = abs(heroY - map.MinY);
-	cursorX = heroX;
-        cursorY = heroY;
-	
+  cursorY = heroY;
+  UI.initialize(map.MenuBorder);
+  message = {"E, I",  "S, J", "D, K",  "F, L", "H",
+             "NORTH", "WEST", "SOUTH", "EAST", "INVENTORY"};
 }
 
-GameState::~GameState()
-{
-	map.saveFile("SavedFile.txt", heroX, heroY);
-}
+GameState::~GameState() { map.saveFile("SavedFile.txt", heroX, heroY); }
 
 // Main travel function
 void GameState::travel(int &direction, WINDOW *win) {
@@ -230,6 +201,7 @@ bool GameState::occupantCheck(int &direction) {
   // Not NULL, we have an occupant
   if (occ) {
     char response = 0;
+
     // Keep prompting user until they provide a valid response.
     do {
       /* Give the user the appropriate pop-up for the encounter.
@@ -259,9 +231,8 @@ bool GameState::occupantCheck(int &direction) {
     /* End the game if the Hero found a diamond. The user has been
      * notified via pop-up already.
      */
-    
     if (occ->typeStr() == "Diamond") {
-      direction = 'q';
+      direction = 'w'; // 'w' for "win"? Or is that what "return true" is for?
       return false;
     }
 
@@ -338,10 +309,6 @@ void GameState::HeroVision(int tempHeroY, int tempHeroX) {
         checkJ = j + 1;
     }
   }
-}
-
-void GameState::revealMap() {
-    map.revealAll();
 }
 
 // Inspect tiles with cursor
@@ -580,24 +547,19 @@ bool GameState::ExpandMap() {
   return false;
 }
 
-void GameState::RunGame(WINDOW * win)
-{
-	int choice = 'a';
+void GameState::RunGame(WINDOW *win) {
+  int choice = 'a';
 
-	HeroVision();
-	map.displayMap(win);
-	UI.whifflesEnergy(theHero.whiffles(), theHero.energy());
-	wattron(win,COLOR_PAIR(6));
-	mvwprintw(win,heroY, heroX, "@");
-	cursorTravel(choice);
-	UI.actions(message);
-	wmove(win,cursorY, cursorX);
-	wrefresh(win);
+  HeroVision();
+  map.displayMap(win);
+  UI.whifflesEnergy(theHero.whiffles(), theHero.energy());
+  wattron(win, COLOR_PAIR(6));
+  mvwprintw(win, heroY, heroX, "@");
+  wmove(win, cursorY, cursorX);
+  wrefresh(win);
 
-	while(choice != 'q')
-	{
-		choice = wgetch(stdscr);
-		travel(choice,win);
-		
-	}
+  while (choice != 'q') {
+    choice = wgetch(stdscr);
+    travel(choice, win);
+  }
 }
