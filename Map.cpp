@@ -25,10 +25,10 @@ Map::Map(string srcFile, int & heroX, int & heroY)
     getmaxyx(stdscr,MaxScreenY,MenuBorder);
 
     MaxY = MaxScreenY;
-    if(MenuBorder > (MAPSIZE * 2))
+    if(MenuBorder > 170)
 	    MenuBorder = MAPSIZE;
     else
-	    MenuBorder = MenuBorder - (MenuBorder/2);
+	    MenuBorder = MenuBorder - (MenuBorder/4);
 
     MaxX = MenuBorder;
     
@@ -41,9 +41,9 @@ Map::Map(string srcFile, int & heroX, int & heroY)
 	}
 
 	if(!(loadOccupants("exampleOccupantFile.txt")))
-  {
+    {
           throw runtime_error("File cannot open");
-  }
+    }
 
     for(int i = 0; i < MAPSIZE; ++i) {
         for(int j = 0; j < MAPSIZE; ++j) {

@@ -12,7 +12,7 @@ GameState::GameState(string mapFile) : map(mapFile, heroX, heroY) {
 
   cursorY = heroY;
   UI.initialize(map.MenuBorder);
-  message = {"E",     "S",    "D",     "F",    "H",
+  message = {"E, I",  "S, J", "D, K",  "F, L", "H",
              "NORTH", "WEST", "SOUTH", "EAST", "INVENTORY"};
 }
 
@@ -208,12 +208,14 @@ bool GameState::occupantCheck(int &direction) {
        * TileOccupant::promptMsg() will give an appropriate message if
        * the user cannot afford an item.
        */
-      response = UI.popup(occ->promptMsg(theHero), occ->getDetails());
 
       // If encountering an Obstacle, the user needs to see their tool choices.
       if (occ->typeStr() == "Obstacle") {
         Obstacle *o = dynamic_cast<Obstacle *>(occ);
-        UI.displayInventory(theHero.getToolOptions(*o));
+        response = UI.popup(occ->promptMsg(theHero), occ->getDetails(),
+                            theHero.getToolOptions(*o));
+      } else {
+        response = UI.popup(occ->promptMsg(theHero), occ->getDetails());
       }
 
     } while (!occ->interact(response, theHero));
@@ -351,7 +353,8 @@ void GameState::cursorTravel(int direction) {
       cursorX = 0;
     break;
   case 'h':
-    // UI.displayInventory(theHero.GetInventory());
+    if (theHero.GetInventory().size())
+      UI.displayInventory(theHero.GetInventory());
     break;
   }
   // Pass in tileType and Occupant to inspect

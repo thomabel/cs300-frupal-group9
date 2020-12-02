@@ -596,8 +596,8 @@ string Food::promptMsg(Hero& theHero)
 {
 	string msg;
 
-	msg = string("You found a delicious ") + name_ "!"; " Would you like to"
-        + "purchase (Y/N)?\n";
+	msg = string("You found a delicious ") + name_ + "!";
+
 	if(theHero.whiffles() >= whiffleCost_)
 	{
         msg = msg +  " Would you like to purchase (Y/N)?\n";

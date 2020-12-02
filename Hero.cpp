@@ -23,7 +23,7 @@ Hero::Hero(const  Hero & orig){
 }
 
 
-vector<vector<string>> Hero::GetInventory()
+vector<vector<string>> Hero::GetInventory() const
 {
     vector<vector<string>> options;
 

@@ -403,7 +403,8 @@ void GameState::cursorTravel(int direction)
                                 cursorX = 0;
                         break;
 		case 'h':
-			  UI.displayInventory(theHero.GetInventory());
+              if (theHero.GetInventory().size())
+                  UI.displayInventory(theHero.GetInventory());
 			break;
 
 	}
