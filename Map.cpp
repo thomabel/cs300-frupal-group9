@@ -17,12 +17,20 @@ Tile::~Tile()
 
 Map::Map(string srcFile, int & heroX, int & heroY)
 {
-    MaxScreenY = 0; //LINES
+    //MaxScreenY = 0; //LINES
 
     //The max we can go on the screen
-    MenuBorder = 0; // MaxScreenX for frupal Map
+    //MenuBorder = 0; // MaxScreenX for frupal Map
     
-    getmaxyx(stdscr,MaxY,MaxX);
+    getmaxyx(stdscr,MaxScreenY,MenuBorder);
+
+    MaxY = MaxScreenY;
+    if(MenuBorder > (MAPSIZE * 2))
+	    MenuBorder = MAPSIZE;
+    else
+	    MenuBorder = MenuBorder - (MenuBorder/2);
+
+    MaxX = MenuBorder;
     
     MinX = 0;
     MinY = 0;
@@ -32,17 +40,15 @@ Map::Map(string srcFile, int & heroX, int & heroY)
 		throw runtime_error("File cannot open");
 	}
 
-    for (int i = 0; i < MAPSIZE; ++i) {
-        for (int j = 0; j < MAPSIZE; ++j) {
-            tileArray[i][j] = Tile();
-        } 
-    }
+	if(!(loadOccupants("exampleOccupantFile.txt")))
+  {
+          throw runtime_error("File cannot open");
+  }
 }
 
 //Read in the map
 bool Map::loadFile(string src, int & heroX, int & heroY)
 {
-
         string temp;
         int i = 0;
         int j = 0;
@@ -53,7 +59,6 @@ bool Map::loadFile(string src, int & heroX, int & heroY)
         //infile.open("practice.txt");
 	infile.open(src);
 	
-	
          //If file was open sucessfully then eneter
         if(infile)
         {
@@ -61,6 +66,8 @@ bool Map::loadFile(string src, int & heroX, int & heroY)
                 infile.ignore(100,',');
                 infile>>heroY;
                 infile.ignore(100,'\n');
+          
+          /*
                 //If end of file is not triggered then enter the loop
                 while(getline(infile,temp))
                 {
@@ -101,6 +108,12 @@ bool Map::loadFile(string src, int & heroX, int & heroY)
                 }
                 infile.close();
 
+	} 
+	else {
+	  return false;
+	}
+  */
+
     // If end of file is not triggered then enter the loop
     while (getline(infile, temp)) {
       for (unsigned int k = 0; k < temp.size(); ++k) {
@@ -135,6 +148,7 @@ bool Map::loadFile(string src, int & heroX, int & heroY)
   } else {
     return false;
   }
+  
   /*
   attron(COLOR_PAIR(5));
   mvwprintw(win,5 ,5," ");
@@ -197,13 +211,13 @@ bool Map::saveFile(string dest, int heroX, int heroY)
 	//Variable: Outfile
 	ofstream outfile;
 	//Open the data.txt files
-        outfile.open("Custom.txt");
+        outfile.open(dest);
 	//Clear what was in function
         outfile.clear();
 	//Close the file
 	outfile.close();
 	//Reopen another file
-        outfile.open("Custom.txt", ios::app);
+        outfile.open(dest, ios::app);
 
 	outfile<<"Last Position of Hero: "<<heroX<<","<<heroY<<endl;
 	//Loop through list.
@@ -219,8 +233,7 @@ bool Map::saveFile(string dest, int heroX, int heroY)
 			else if(tileArray[i][j].type->toString() == "Wall")
 				outfile<<"M";
 			else if(tileArray[i][j].type->toString() == "Swamp")
-
-			outfile<<"S";
+				outfile<<"S";
 		}
 		outfile<<endl;
 	}
@@ -267,10 +280,10 @@ bool Map::saveOccupants(string dest) {
 }
 
 // Return what type of tile it is
-TileType *Map::tileTypeAt(int row, int col) { return tileArray[row][col].type; }
+TileType *Map::tileTypeAt(int col, int row) { return tileArray[row][col].type; }
 
 // Return what  occupies the tile
-TileOccupant *Map::occupantAt(int row, int col) {
+TileOccupant *Map::occupantAt(int col, int row) {
   return tileArray[row][col].occupant;
 }
 // Reveal the tile(Discovered)
@@ -279,7 +292,7 @@ void Map::tile_revealed(int row, int col) {
 }
 
 // Remove a tileOccupant, typicaly after it is bought/consumed/looted
-void Map::setOccupantAt(int row, int col, TileOccupant* newOccupant) {
+void Map::setOccupantAt(int col, int row, TileOccupant* newOccupant) {
     TileOccupant *& temp = tileArray[row][col].occupant;
 
     if (temp)
@@ -289,10 +302,11 @@ void Map::setOccupantAt(int row, int col, TileOccupant* newOccupant) {
 }
 
 // Have we been at tile before
-bool Map::isTileDiscovered(int row, int col) {
-  if (tileArray[row][col].revealed)
+bool Map::isTileDiscovered(int col, int row) {
+  if (tileArray[row][col].revealed) {
     return true;
-
+  }
+  
   return false;
 }
 
@@ -310,10 +324,12 @@ void Map::displayMap(WINDOW *win) {
 
         if (tileArray[i][j].occupant != NULL &&
             tileArray[i][j].occupant->typeStr() == "Diamond") {
-          attron(COLOR_PAIR(1));
+
+          wattron(win,COLOR_PAIR(1));
           mvwprintw(win, i - MinY, j - MinX, MarkerDisplay.data());
         } else {
-          attron(COLOR_PAIR(tileArray[i][j].type->color()));
+          wattron(win,COLOR_PAIR(tileArray[i][j].type->color()));
+
           mvwprintw(win, i - MinY, j - MinX, MarkerDisplay.data());
         }
       }
