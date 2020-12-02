@@ -6,7 +6,6 @@ bool TileType::canEnter(const Hero& theHero) const
     // By default, a tile can be entered.
     return true;
 }
-
 int TileType::energyCost() const
 {
     // By default, traveling through a tile costs 1 energy.
@@ -27,7 +26,6 @@ bool Wall::canEnter(const Hero& theHero) const
 {
     return false;
 }
-
 int Wall::color() const
 {
     return COLOR_WHITE;   

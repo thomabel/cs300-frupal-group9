@@ -6,6 +6,7 @@
 #ifndef GameState_CLASS
 #define GameState_CLASS
 
+#include <ncurses.h>
 #include"Map.h"
 #include"Hero.h"
 #include"UI.h"
@@ -16,7 +17,7 @@ class GameState
 {
 	public:
 		
-		GameState();
+		GameState(string mapFile = "Frupal.txt");
 		~GameState();
 		
 		void travel(int & direction, WINDOW * win);
@@ -31,12 +32,14 @@ class GameState
 
 		void HeroVision();
 		void HeroVision(int tempHeroY, int tempHeroX);
+        void revealMap();
 		void RunGame(WINDOW * win);
 	
 	private:
 		Hero theHero;
 		Map map;
 		UserInterface UI;
+		vector<string> message;
 		int cursorX;
 		int cursorY;
 		int heroX;

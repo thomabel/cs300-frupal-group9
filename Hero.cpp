@@ -10,7 +10,8 @@ Hero::Hero(){
     hasBinoculars_ = false;
     hasShip_ = false;
     whiffles_ = 1000;
-    energy_ = 100;
+    //energy_ = 100;
+    energy_ = 10000;
 }
 
 Hero::Hero(const  Hero & orig){
@@ -20,6 +21,29 @@ Hero::Hero(const  Hero & orig){
     this->whiffles_ = orig.whiffles_;
     this->energy_ = orig.energy_;
 }
+
+
+vector<vector<string>> Hero::GetInventory() const
+{
+    vector<vector<string>> options;
+
+    for (unsigned int i = 0; i < inventory_.size(); ++i) {
+        // Get the details of the 
+        vector<string> details = inventory_.at(i)->getDetails();
+
+        // Put the name of the tool in the right column
+        details.at(details.size()/2) = details.at(0);
+        
+        // Set the left column to the choice for selecting it
+        details.at(0) = string(1, choiceIndexToChar(i));
+
+        // Add the details array to the array of details arrays
+        options.push_back(details);
+    }
+    
+    return options;
+}
+
 
 //returns list of tools usable on Obstacle
 vector<Tool*> Hero::getUsableTools(Obstacle &current){
@@ -61,7 +85,8 @@ void Hero::addInventory(Tool * toAdd){
 
 bool Hero::consumeTool(Tool * xtool){
     bool success = false;
-    for(auto i = inventory_.begin(); i != inventory_.end(); ++i){
+    auto end  = inventory_.end();
+    for(auto i = inventory_.begin(); i != end; ++i){
         if(*i == xtool){
             inventory_.erase(i);
             success = true;

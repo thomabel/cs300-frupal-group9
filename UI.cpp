@@ -147,9 +147,8 @@ char UserInterface::displayInventory(
         }
         // Scroll downwards.
         else if (ch == CTRL_DOWN){
-            ist += 1;
-            if (ist >= ts)
-                ist = ts - 1; 
+            if (ist < ts)
+              ist++;
         }
         else if (getInput && ch != CTRL_INV){
             break;
@@ -171,7 +170,7 @@ char UserInterface::popup(std::string msg){
     
     // Add the string, get input.
     werase(pop);
-    mvwaddstr(pop, 0, 0, msg.data());
+    mvwaddstr(pop, 0, getmaxx(pop) / 2, msg.data());
     ch = getch();
 
     // Hide popup when finished.
@@ -193,7 +192,7 @@ char UserInterface::popup(std::string msg,
 
     // Add the string.
     werase(pop);
-    mvwaddstr(pop, 0, 0, msg.data());
+    mvwaddstr(pop, 0, getmaxx(pop) / 2, msg.data());
     ypos = getmaxy(pop) - values.size() / 2 - 1;
     printDualCol(pop, ypos, 0, values);
     // Wait for input.
@@ -220,7 +219,7 @@ char UserInterface::popup(std::string message,
 
     // Display popup text.
     werase(pop);
-    mvwaddstr(pop, 0, 0, message.data());
+    mvwaddstr(pop, 0, getmaxx(pop) / 2, message.data());
     ypos = getmaxy(pop) - obstacle.size() / 2 - 1;
     printDualCol(pop, ypos, 0, obstacle);
     // Display inventory and get input.

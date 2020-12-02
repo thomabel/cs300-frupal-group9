@@ -31,6 +31,7 @@ class Hero{
       int addWhiffles(int);
       void setHasBinoculars(bool);
       void setHasShip(bool);
+      vector<vector<string>> GetInventory() const;
 
     private:
       vector<Tool*> inventory_;
