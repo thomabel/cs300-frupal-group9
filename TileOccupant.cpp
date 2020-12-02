@@ -7,6 +7,7 @@ Description:
 */
 
 #include "TileOccupant.h"
+#include <cmath>
 
 using namespace std;
 
@@ -1003,7 +1004,7 @@ bool Obstacle::interact(char promptResponse, Hero& theHero)
     int toolInd = charToChoiceIndex(promptResponse);
 
     // Check if the promptResponse is invalid.
-    if ((toolInd < 0 && toolInd >= static_cast<int>(usableTools.size())) && 
+    if ((toolInd < 0 || toolInd >= static_cast<int>(usableTools.size())) && 
         promptResponse != ' ') {
         return false;
     }
@@ -1018,8 +1019,8 @@ bool Obstacle::interact(char promptResponse, Hero& theHero)
             throw std::runtime_error("missing tool");
 
         // Cost is reduced by a factor of the rating, rounding up.
-        energyCost_ /= chosenTool->rating();
-        energyCost_++;
+        energyCost_ = ceil(static_cast<float>(energyCost_) / 
+            chosenTool->rating());
 
         // Remove the tool from the Hero's inventory.
         theHero.consumeTool(chosenTool);

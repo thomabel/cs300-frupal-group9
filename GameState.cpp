@@ -1,231 +1,190 @@
 #include "GameState.h"
 #include "TileType.h"
 
-GameState::GameState(string mapFile): map(mapFile, heroX, heroY)
-{
-	//string MapsrcFile = "Frupal.txt";
-	//Where should the player start?
-	//heroX =0;
-        //heroY =0;
-	
-	//Should start at Hero position
-	cursorX = heroX;
-
-	cursorY = heroY;
-	UI.initialize(map.MenuBorder);
-	message = {"E, I", "S, J", "D, K", "F, L", "H",
-    "NORTH", "WEST", "SOUTH", "EAST", "INVENTORY"};
-}
-
-GameState::~GameState()
-{
-	map.saveFile("SavedFile.txt", heroX, heroY);
-}
-
-//Main travel function
-void GameState::travel(int & direction, WINDOW * win)
-{
-	//Only Time this doesn't enter is when we 
-	//move the cursor or exit the program due to not having
-	//enough energy (Should Also not enter when Diamond is found)
-	if(HeroTravel(direction))
-	{
-
-		//Enter if want to continue to explore the map
-		if(ExpandMap())
-		{
-			//Clear screen
-			for(int i = 0; i<map.MaxScreenY; ++i)
-			{
-				for(int j = 0; j<map.MenuBorder; ++j)
-				{
-						attron(COLOR_PAIR(3));
-						mvwprintw(win,i ,j," ");
-
-				}
-			}
-		}
-		
-		//What the hero can see
-		HeroVision();
-
-		map.displayMap(win);
-
-	        UI.actions(message);
-
-		UI.whifflesEnergy(theHero.whiffles(), theHero.energy());
-
-	}
-
-	wattron(win,COLOR_PAIR(6));
-	mvwprintw(win,heroY, heroX, "@");
-
-	wmove(win,cursorY, cursorX);
-	wrefresh(win);
+GameState::GameState(string mapFile) : map(mapFile, heroX, heroY) {
+  // string MapsrcFile = "Frupal.txt";
+  // Where should the player start?
+  // heroX =0;
+  // heroY =0;
 
   // Should start at Hero position
+  cursorX = heroX;
+
+  cursorY = heroY;
   
-  //cursorX = heroX;
-  //cursorY = heroY;
+  int x;
+  x = getmaxx(stdscr);
+  UI.initialize(3*x/10);
+  message = {"E, I",  "S, J", "D, K",  "F, L", "H",
+             "NORTH", "WEST", "SOUTH", "EAST", "INVENTORY"};
 }
 
-//The hero traveling 
-bool GameState::HeroTravel(int & direction)
-{
-	TileType * temp_type = NULL;
+GameState::~GameState() { map.saveFile("SavedFile.txt", heroX, heroY); }
 
-	switch(direction)
-	{
-		//These four cases is when user wants
-		//to move the Hero.
-		case 'i':
-			if(heroY-1 >= -1)
-			{
-				if(heroY-1 == -1)
-					--heroY;
-				else
-				{
-					//Move hero up
-					--heroY;
-					temp_type = map.tileTypeAt(heroX+map.MinX, heroY+map.MinY);
-					//Check if we can enter
-					if(temp_type->canEnter(theHero))
-					{
-						//Make sure take away the energy needed to get here
-						theHero.addEnergy((temp_type->energyCost() * -1 ));
-						//Make sure we still have enough energy
-						if(theHero.energy() <= 0)
-						{
-							//If we don't then exit the program
-							direction = 'q';
-							return false;
-						}
-						//Check our occupant
-						return occupantCheck(direction);
-					}
-					else
-					{
-						++heroY;
-						return false;
-					}
-				}
-			}
-			else
-				heroY = 0;
-			break;
+// Main travel function
+void GameState::travel(int &direction, WINDOW *win) {
+  // Only Time this doesn't enter is when we
+  // move the cursor or exit the program due to not having
+  // enough energy (Should Also not enter when Diamond is found)
+  if (HeroTravel(direction)) {
 
-		case 'k':
-			if(heroY+1 < map.MaxScreenY+1)
-			{
-				if(heroY+1 == map.MaxScreenY)
-                                        ++heroY;
-				else
-				{
-					//Same as above but move down
-					++heroY;
-					temp_type = map.tileTypeAt(heroX+map.MinX, heroY+map.MinY);
-					if(temp_type->canEnter(theHero))
-					{
-						theHero.addEnergy((temp_type->energyCost() * -1 ));
-						if(theHero.energy() <= 0)
-                                                {
-                                                        direction = 'q';
-                                                        return false;
-                                                }
-						return occupantCheck(direction);
+    // Enter if want to continue to explore the map
+    if (ExpandMap()) {
+      // Clear screen
+      for (int i = 0; i < map.MaxScreenY; ++i) {
+        for (int j = 0; j < map.MenuBorder; ++j) {
+          attron(COLOR_PAIR(3));
+          mvwprintw(win, i, j, " ");
+        }
+      }
+    }
 
-					}
-					else
-					{
-						--heroY;
-						return false;
-					}
-				}
-			
-			}
-			else
-				heroY = map.MaxScreenY-1;
-			break;
+    // What the hero can see
+    HeroVision();
 
-		case 'l':
-			if(heroX+1 < map.MenuBorder+1)
-			{
-				if(heroX+1 == map.MenuBorder)
-                                        ++heroX;
-                                else
-                                {
-					//Move right
-                                        ++heroX;
-                                        temp_type = map.tileTypeAt(heroX+map.MinX, heroY+map.MinY);
-                                        if(temp_type->canEnter(theHero))
-					{
-						theHero.addEnergy((temp_type->energyCost() * -1 ));
-						if(theHero.energy() <= 0)
-                                                {
-                                                        direction = 'q';
-                                                        return false;
-                                                }
-						return occupantCheck(direction);
+    map.displayMap(win);
 
+    UI.actions(message);
 
-					}
-                                        else
-					{
-                                                --heroX;
-						return false;
-					}
-                                }
+    UI.whifflesEnergy(theHero.whiffles(), theHero.energy());
+  }
 
-			}
-			else
-				heroX = map.MenuBorder-1;
+  wattron(win, COLOR_PAIR(6));
+  mvwprintw(win, heroY, heroX, "@");
 
-			break;
-		case 'j':
-			if(heroX-1 >= -1)
-			{
-				if(heroX-1 == -1)
-                                        --heroX;
-                                else
-                                {
-					//Move left
-                                        --heroX;
-                                        temp_type = map.tileTypeAt(heroX+map.MinX, heroY+map.MinY);
-                                        if(temp_type->canEnter(theHero))
-					{
-						theHero.addEnergy((temp_type->energyCost() * -1 ));
-						if(theHero.energy() <= 0)
-                                                {
-                                                        direction = 'q';
-                                                        return false;
-                                                }
-						occupantCheck(direction);
-						return true;
+  wmove(win, cursorY, cursorX);
+  wrefresh(win);
 
-					}
-                                        else
-					{
-                                                ++heroX;
-						return false;
-					}
-                                }
+  // Should start at Hero position
 
-			}
-			else
-				heroX = 0;
-			break;
-		default:
-			cursorTravel(direction);
-			return false;
+  // cursorX = heroX;
+  // cursorY = heroY;
+}
 
+// The hero traveling
+bool GameState::HeroTravel(int &direction) {
+  TileType *temp_type = NULL;
 
-	}
-	return true;
+  switch (direction) {
+  // These four cases is when user wants
+  // to move the Hero.
+  case 'i':
+    if (heroY - 1 >= -1) {
+      if (heroY - 1 == -1)
+        --heroY;
+      else {
+        // Move hero up
+        --heroY;
+        temp_type = map.tileTypeAt(heroX + map.MinX, heroY + map.MinY);
+        // Check if we can enter
+        if (temp_type->canEnter(theHero)) {
+          // Make sure take away the energy needed to get here
+          theHero.addEnergy((temp_type->energyCost() * -1));
+          // Make sure we still have enough energy
+          if (theHero.energy() <= 0) {
+            // If we don't then exit the program
+            direction = 'q';
+            return false;
+          }
+          // Check our occupant
+          return occupantCheck(direction);
+        } else {
+          ++heroY;
+          return false;
+        }
+      }
+    } else
+      heroY = 0;
+    break;
+
+  case 'k':
+    if (heroY + 1 < map.MaxScreenY + 1) {
+      if (heroY + 1 == map.MaxScreenY)
+        ++heroY;
+      else {
+        // Same as above but move down
+        ++heroY;
+        temp_type = map.tileTypeAt(heroX + map.MinX, heroY + map.MinY);
+        if (temp_type->canEnter(theHero)) {
+          theHero.addEnergy((temp_type->energyCost() * -1));
+          if (theHero.energy() <= 0) {
+            direction = 'q';
+            return false;
+          }
+          return occupantCheck(direction);
+
+        } else {
+          --heroY;
+          return false;
+        }
+      }
+
+    } else
+      heroY = map.MaxScreenY - 1;
+    break;
+
+  case 'l':
+    if (heroX + 1 < map.MenuBorder + 1) {
+      if (heroX + 1 == map.MenuBorder)
+        ++heroX;
+      else {
+        // Move right
+        ++heroX;
+        temp_type = map.tileTypeAt(heroX + map.MinX, heroY + map.MinY);
+        if (temp_type->canEnter(theHero)) {
+          theHero.addEnergy((temp_type->energyCost() * -1));
+          if (theHero.energy() <= 0) {
+            direction = 'q';
+            return false;
+          }
+          return occupantCheck(direction);
+
+        } else {
+          --heroX;
+          return false;
+        }
+      }
+
+    } else
+      heroX = map.MenuBorder - 1;
+
+    break;
+  case 'j':
+    if (heroX - 1 >= -1) {
+      if (heroX - 1 == -1)
+        --heroX;
+      else {
+        // Move left
+        --heroX;
+        temp_type = map.tileTypeAt(heroX + map.MinX, heroY + map.MinY);
+        if (temp_type->canEnter(theHero)) {
+          theHero.addEnergy((temp_type->energyCost() * -1));
+          if (theHero.energy() <= 0) {
+            direction = 'q';
+            return false;
+          }
+          occupantCheck(direction);
+          return true;
+
+        } else {
+          ++heroX;
+          return false;
+        }
+      }
+
+    } else
+      heroX = 0;
+    break;
+  default:
+    cursorTravel(direction);
+    return false;
+  }
+  return true;
 }
 
 // What occupies the tile
 bool GameState::occupantCheck(int &direction) {
-  
+
   /* "Row" does not correspond to the horizontal axis, so this is questionable
    * at best.
    */
@@ -238,8 +197,8 @@ bool GameState::occupantCheck(int &direction) {
    * Since this ship was already purchased, it has no cost.
    */
   if (theHero.hasShip() && tileType->toString() != "Water") {
-      map.setOccupantAt(r, c, new Ship(0, true));
-      theHero.setHasShip(false);
+    map.setOccupantAt(r, c, new Ship(0, true));
+    theHero.setHasShip(false);
   }
 
   // Not NULL, we have an occupant
@@ -255,16 +214,15 @@ bool GameState::occupantCheck(int &direction) {
 
       // If encountering an Obstacle, the user needs to see their tool choices.
       if (occ->typeStr() == "Obstacle") {
-        Obstacle *o = dynamic_cast<Obstacle*>(occ);
-        response = UI.popup(occ->promptMsg(theHero), occ->getDetails(), 
-          theHero.getToolOptions(*o));
-      }
-      else {
+        Obstacle *o = dynamic_cast<Obstacle *>(occ);
+        response = UI.popup(occ->promptMsg(theHero), occ->getDetails(),
+                            theHero.getToolOptions(*o));
+      } else {
         response = UI.popup(occ->promptMsg(theHero), occ->getDetails());
       }
-      
+
     } while (!occ->interact(response, theHero));
-    
+
     /* End the game if the Hero is out of energy. The user has been
      * notified via pop-up already.
      */
@@ -287,9 +245,7 @@ bool GameState::occupantCheck(int &direction) {
     if (!occ->permanent()) {
       map.setOccupantAt(r, c, 0);
     }
- 
   }
-
 
   return true;
 }
@@ -312,7 +268,7 @@ void GameState::HeroVision() {
     }
   }
 }
-             
+
 // How much the hero can see on his journey
 void GameState::HeroVision(int tempHeroY, int tempHeroX) {
 
@@ -358,86 +314,80 @@ void GameState::HeroVision(int tempHeroY, int tempHeroX) {
   }
 }
 
-//Inspect tiles with cursor
-void GameState::cursorTravel(int direction)
-{
-	TileType * temp_type = NULL;
-        TileOccupant * occupant_temp = NULL;
-	string temp;
-	vector <string> details;
+// Inspect tiles with cursor
+void GameState::cursorTravel(int direction) {
+  TileType *temp_type = NULL;
+  TileOccupant *occupant_temp = NULL;
+  string temp;
+  vector<string> details;
 
-	switch(direction)
-	{
-		//These four cases is when user wants
-                //to move cursor, and these cases move the
-                //cursor accordingly.
+  switch (direction) {
+  // These four cases is when user wants
+  // to move cursor, and these cases move the
+  // cursor accordingly.
 
-		//WHat Function to call to get details of Tile
-		case 'e':
-                        if(cursorY-1 > 0)
-                                --cursorY;
-                        else
-                                cursorY = 0;
-                        break;
+  // WHat Function to call to get details of Tile
+  case 'e':
+    if (cursorY - 1 > 0)
+      --cursorY;
+    else
+      cursorY = 0;
+    break;
 
-                case 'd':
-                        if(cursorY+1 < map.MaxScreenY)
-                                ++cursorY;
-                        else
-                                cursorY = map.MaxScreenY-1;
+  case 'd':
+    if (cursorY + 1 < map.MaxScreenY)
+      ++cursorY;
+    else
+      cursorY = map.MaxScreenY - 1;
 
-                        break;
+    break;
 
+  case 'f':
+    if (cursorX + 1 < map.MenuBorder)
+      ++cursorX;
+    else
+      cursorX = map.MenuBorder - 1;
+    break;
 
-                case 'f':
-                        if(cursorX+1 < map.MenuBorder)
-                                ++cursorX;
-                        else
-                                cursorX = map.MenuBorder-1;
-                        break;
+  case 's':
+    if (cursorX - 1 > 0)
+      --cursorX;
+    else
+      cursorX = 0;
+    break;
+  case 'h':
+    if (theHero.GetInventory().size())
+      UI.displayInventory(theHero.GetInventory());
+    break;
+  }
+  // Pass in tileType and Occupant to inspect
 
-                case 's':
-                        if(cursorX-1 > 0)
-                                --cursorX;
-                        else
-                                cursorX = 0;
-                        break;
-		case 'h':
-              if (theHero.GetInventory().size())
-                  UI.displayInventory(theHero.GetInventory());
-			break;
+  if (map.isTileDiscovered(cursorX + map.MinX, cursorY + map.MinY)) {
+    temp_type = map.tileTypeAt(cursorX + map.MinX, cursorY + map.MinY);
+    occupant_temp = map.occupantAt(cursorX + map.MinX, cursorY + map.MinY);
 
-	}
-	//Pass in tileType and Occupant to inspect 
+    if (occupant_temp) {
+      details = occupant_temp->getDetails();
+      //	if(details.size() % 2 == 0)
+      //	{
+      //	I think that details should give an even vector.
+      int i = details.size() / 2;
+      temp = temp_type->toString();
+      details.insert(details.begin(), temp);
+      details.insert(details.begin() + i, "Grovnick");
+      UI.tileInspect(details);
 
-	if(map.isTileDiscovered(cursorX+map.MinX, cursorY+map.MinY)){ 
-		temp_type= map.tileTypeAt(cursorX+map.MinX, cursorY+map.MinY);
-		occupant_temp = map.occupantAt(cursorX+map.MinX, cursorY+map.MinY);
+      //	}
 
-		if(occupant_temp){
-			details = occupant_temp->getDetails();
-		//	if(details.size() % 2 == 0)
-		//	{
-		//	I think that details should give an even vector.
-			int i = details.size()/2;
-			temp = temp_type->toString();
-			details.insert(details.begin(),temp);
-			details.insert(details.begin() + i, "Grovnick");
-			UI.tileInspect(details);
+    } else {
+      temp = temp_type->toString();
+      details.push_back(temp);
+      details.push_back("Grovnick");
+      UI.tileInspect(details);
+    }
+  }
 
-
-		//	}
-
-		}
-		else{
-			temp = temp_type->toString();
-			details.push_back(temp);
-			details.push_back("Grovnick");
-			UI.tileInspect(details);
-		}
-	}
-
-	//UI.tileInspect(temp_type, occupant_temp);
+  // UI.tileInspect(temp_type, occupant_temp);
 }
 
 bool GameState::ExpandMap() {
@@ -514,74 +464,74 @@ bool GameState::ExpandMap() {
 
     if (map.MinX != 0) {
 
-/*
-    temp = heroY + map.MinY;
+      /*
+          temp = heroY + map.MinY;
 
-    map.MinY = map.MaxY - (map.MaxScreenY / 2);
-    map.MaxY = map.MaxY + (map.MaxScreenY / 2);
+          map.MinY = map.MaxY - (map.MaxScreenY / 2);
+          map.MaxY = map.MaxY + (map.MaxScreenY / 2);
 
-    // Account for ODD #
-    if (map.MaxY - map.MinY < map.MaxScreenY)
-      ++map.MaxY;
+          // Account for ODD #
+          if (map.MaxY - map.MinY < map.MaxScreenY)
+            ++map.MaxY;
 
-    if (map.MaxY > (map.MAPSIZE - 1)) {
-      map.MaxY = map.MAPSIZE;
-      map.MinY = map.MAPSIZE - map.MaxScreenY;
-    }
+          if (map.MaxY > (map.MAPSIZE - 1)) {
+            map.MaxY = map.MAPSIZE;
+            map.MinY = map.MAPSIZE - map.MaxScreenY;
+          }
 
-    heroY = abs((temp - map.MinY));
-    heroX = heroX;
-    return true;
+          heroY = abs((temp - map.MinY));
+          heroX = heroX;
+          return true;
 
-  }
-  // Go back up
-  else if (heroY == -1) {
-    ++heroY;
-    temp = heroY + map.MinY;
+        }
+        // Go back up
+        else if (heroY == -1) {
+          ++heroY;
+          temp = heroY + map.MinY;
 
-    map.MinY -= (map.MaxScreenY / 2);
-    map.MaxY -= (map.MaxScreenY / 2);
+          map.MinY -= (map.MaxScreenY / 2);
+          map.MaxY -= (map.MaxScreenY / 2);
 
-    if (map.MinY <= -1) {
-      map.MaxY = map.MaxScreenY;
-      map.MinY = 0;
-    }
+          if (map.MinY <= -1) {
+            map.MaxY = map.MaxScreenY;
+            map.MinY = 0;
+          }
 
-    heroY = abs((temp - map.MinY));
-    heroX = heroX;
-    return true;
+          heroY = abs((temp - map.MinY));
+          heroX = heroX;
+          return true;
 
-  }
+        }
 
-  // Explore right
-  else if (heroX == map.MenuBorder) {
-    --heroX;
+        // Explore right
+        else if (heroX == map.MenuBorder) {
+          --heroX;
 
-    temp = heroX + map.MinX;
+          temp = heroX + map.MinX;
 
-    map.MinX = map.MaxX - (map.MenuBorder / 2);
-    map.MaxX = map.MaxX + (map.MenuBorder / 2);
+          map.MinX = map.MaxX - (map.MenuBorder / 2);
+          map.MaxX = map.MaxX + (map.MenuBorder / 2);
 
-    // Account for ODD #
-    if (map.MaxX - map.MinX < map.MenuBorder)
-      ++map.MaxX;
+          // Account for ODD #
+          if (map.MaxX - map.MinX < map.MenuBorder)
+            ++map.MaxX;
 
-    if (map.MaxX > (map.MAPSIZE - 1)) {
-      map.MaxX = map.MAPSIZE;
-      map.MinX = map.MAPSIZE - map.MenuBorder;
-    }
+          if (map.MaxX > (map.MAPSIZE - 1)) {
+            map.MaxX = map.MAPSIZE;
+            map.MinX = map.MAPSIZE - map.MenuBorder;
+          }
 
-    heroX = abs(temp - map.MinX);
-    heroY = heroY;
-    return true;
-  }
+          heroX = abs(temp - map.MinX);
+          heroY = heroY;
+          return true;
+        }
 
-  // explore left
-  else if (heroX == -1) {
-    ++heroX;
+        // explore left
+        else if (heroX == -1) {
+          ++heroX;
 
-    if (map.MinX != 0) {
-*/
+          if (map.MinX != 0) {
+      */
       temp = heroX + map.MinX;
 
       map.MinX -= (map.MenuBorder / 2);
@@ -600,21 +550,19 @@ bool GameState::ExpandMap() {
   return false;
 }
 
-void GameState::RunGame(WINDOW * win)
-{
-	int choice = 'a';
+void GameState::RunGame(WINDOW *win) {
+  int choice = 'a';
 
-	HeroVision();
-	map.displayMap(win);
-	UI.whifflesEnergy(theHero.whiffles(), theHero.energy());
-	wattron(win,COLOR_PAIR(6));
-	mvwprintw(win,heroY, heroX, "@");
-	wmove(win,cursorY, cursorX);
-	wrefresh(win);
+  HeroVision();
+  map.displayMap(win);
+  UI.whifflesEnergy(theHero.whiffles(), theHero.energy());
+  wattron(win, COLOR_PAIR(6));
+  mvwprintw(win, heroY, heroX, "@");
+  wmove(win, cursorY, cursorX);
+  wrefresh(win);
 
-	while(choice != 'q')
-	{
-		choice = wgetch(stdscr);
-		travel(choice,win);
-	}
+  while (choice != 'q') {
+    choice = wgetch(stdscr);
+    travel(choice, win);
+  }
 }

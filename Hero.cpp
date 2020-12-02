@@ -85,7 +85,8 @@ void Hero::addInventory(Tool * toAdd){
 
 bool Hero::consumeTool(Tool * xtool){
     bool success = false;
-    for(auto i = inventory_.begin(); i != inventory_.end(); ++i){
+    auto end  = inventory_.end();
+    for(auto i = inventory_.begin(); i != end; ++i){
         if(*i == xtool){
             inventory_.erase(i);
             success = true;

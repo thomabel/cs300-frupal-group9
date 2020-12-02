@@ -28,7 +28,7 @@ Map::Map(string srcFile, int & heroX, int & heroY)
     if(MenuBorder > 170)
 	    MenuBorder = MAPSIZE;
     else
-	    MenuBorder = MenuBorder - (MenuBorder/4);
+	    MenuBorder = MenuBorder - (3*MenuBorder/10);
 
     MaxX = MenuBorder;
     
@@ -164,6 +164,7 @@ bool Map::loadFile(string src, int & heroX, int & heroY)
   return true; // placeholder for better things
 }
 
+        
 bool Map::loadOccupants(string src) {
   string temp;
 
@@ -172,30 +173,31 @@ bool Map::loadOccupants(string src) {
   fin.open(src);
 
   if (fin) {
-    getline(fin, temp);
-    int qty = stoi(temp);
+    // Convert the file to a vector of strings
+    vector<string> contents = inputFile(src); 
 
-    for (int i = 0; i < qty; ++i) {
-      // Discard whitespace line
-      getline(fin, temp);
+    // Remove empty lines and comments
+    contents = cleanFile(contents);
+
+    // The first (used) line must be the occupant count
+    int qty = stoi(contents[0]);
+
+    for (int i = 1; i <= qty; ++i) {
+      // Convert line to stream 
+      stringstream thisLine(contents[i]);
 
       // Read coordinates of tileOccupant
-      getline(fin, temp, ',');
+      getline(thisLine, temp, ',');
       int row = stoi(temp);
-      getline(fin, temp);
+      getline(thisLine, temp, ',');
       int col = stoi(temp);
 
-      // Read tileOccupant type string (without trailing
-      // whitespace)
-      getline(fin, temp);
-      string type = temp.erase(temp.find_last_not_of(" \t") + 1);
+      // Read tileOccupant type string (without trailing whitespace)
+      getline(thisLine, temp, ',');
+      string type = temp;
 
       // Read tileOccupant data as comma-separated values
-      getline(fin, temp);
-
-      // Quit and fail if there were issues with the stream
-      if (!fin)
-        return false;
+      getline(thisLine, temp);
 
       // If the tile already has an occupant, remove it.
      

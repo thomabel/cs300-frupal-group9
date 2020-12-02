@@ -118,4 +118,41 @@ TileOccupant *csvToTool(const string &csv)
         return new Tool(name, price, rating, usableOn);
 }
 
+vector<string> inputFile(string src) {
+    ifstream fin;
+   
+    fin.open(src);
+    
+    if (!fin)
+        throw std::runtime_error("Failed to load " + src);
+
+    vector<string> contents;
+    string temp;
+ 
+    while (getline(fin, temp)) {
+        contents.push_back(temp);
+    }
+
+    return contents;
+}
+
+vector<string> cleanFile(vector<string> src) {
+    vector<string> lines;
+
+    // Erase comments
+    for (auto &line : src) {
+        size_t n = line.find("//");
+        if (n != string::npos)
+            line.erase(n);
+    }
+    
+    // Read in the entire file, excluding empty lines
+    for (auto &line : src) {
+        if (line.size() != 0 && line.find_first_not_of(" \n\t") != string::npos) {//line[0] != ' '/*line != string(' ', line.size())*/) {
+            lines.push_back(line);
+        }
+    }
+
+    return lines;
+}
 
