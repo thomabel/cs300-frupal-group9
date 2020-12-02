@@ -4,11 +4,12 @@
 #include <string>
 #include "Hero.h"
 
+class Hero;
+
 class TileType
 {
 public:
-    virtual ~TileType() = 0;
-
+    virtual ~TileType() {}
     virtual bool canEnter(const Hero& theHero) const;
     virtual int energyCost() const;
     virtual int color() const = 0;
@@ -43,4 +44,5 @@ class Water : public TileType
     int color() const override;
     std::string toString() const override;
 };
+
 #endif

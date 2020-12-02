@@ -16,11 +16,11 @@ Ship
 Treasure
 1000
 
-1,9
+45,9
 Clue
 You are 20 grovnicks from the western border, there is a swamp 30 grovniks to the north, and the royal diamonds are located 40 grovnicks to the east and 50 grovnicks to the South.
 
-8,8
+48,8
 Diamond
 //Diamond has no data and this line is discarded. Include it nevertheless.
 
