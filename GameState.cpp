@@ -1,7 +1,7 @@
 #include "GameState.h"
 #include "TileType.h"
 
-GameState::GameState(): map("Frupal.txt", heroX, heroY)
+GameState::GameState(string mapFile): map(mapFile, heroX, heroY)
 {
 	//string MapsrcFile = "Frupal.txt";
 	//Where should the player start?
@@ -13,7 +13,7 @@ GameState::GameState(): map("Frupal.txt", heroX, heroY)
 
 	cursorY = heroY;
 	UI.initialize(map.MenuBorder);
-	message = {"E", "S", "D", "F", "H",
+	message = {"E, I", "S, J", "D, K", "F, L", "H",
     "NORTH", "WEST", "SOUTH", "EAST", "INVENTORY"};
 }
 
@@ -234,6 +234,14 @@ bool GameState::occupantCheck(int &direction) {
   TileType *tileType = map.tileTypeAt(r, c);
   TileOccupant *occ = map.occupantAt(r, c);
 
+  /* If the hero is leaving water, then they leave their ship on the shore.
+   * Since this ship was already purchased, it has no cost.
+   */
+  if (theHero.hasShip() && tileType->toString() != "Water") {
+      map.setOccupantAt(r, c, new Ship(0, true));
+      theHero.setHasShip(false);
+  }
+
   // Not NULL, we have an occupant
   if (occ) {
     char response = 0;
@@ -244,12 +252,15 @@ bool GameState::occupantCheck(int &direction) {
        * TileOccupant::promptMsg() will give an appropriate message if
        * the user cannot afford an item.
        */
-      response = UI.popup(occ->promptMsg(theHero), occ->getDetails());
 
       // If encountering an Obstacle, the user needs to see their tool choices.
       if (occ->typeStr() == "Obstacle") {
         Obstacle *o = dynamic_cast<Obstacle*>(occ);
-        UI.displayInventory(theHero.getToolOptions(*o));
+        response = UI.popup(occ->promptMsg(theHero), occ->getDetails(), 
+          theHero.getToolOptions(*o));
+      }
+      else {
+        response = UI.popup(occ->promptMsg(theHero), occ->getDetails());
       }
       
     } while (!occ->interact(response, theHero));
@@ -274,19 +285,11 @@ bool GameState::occupantCheck(int &direction) {
      * If not, remove it from the map.
      */
     if (!occ->permanent()) {
-      delete occ;
       map.setOccupantAt(r, c, 0);
     }
  
   }
 
-  /* If the hero is leaving water, then they leave their ship on the shore.
-   * Since this ship was already purchased, it has no cost.
-   */
-  if (theHero.hasShip() && tileType->toString() != "Water") {
-      map.setOccupantAt(r, c, new Ship(0, true));
-      theHero.setHasShip(false);
-  }
 
   return true;
 }
@@ -400,7 +403,7 @@ void GameState::cursorTravel(int direction)
                                 cursorX = 0;
                         break;
 		case 'h':
-			//UI.displayInventory(theHero.GetInventory());
+			  UI.displayInventory(theHero.GetInventory());
 			break;
 
 	}

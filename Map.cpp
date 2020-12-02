@@ -44,6 +44,12 @@ Map::Map(string srcFile, int & heroX, int & heroY)
   {
           throw runtime_error("File cannot open");
   }
+
+    for(int i = 0; i < MAPSIZE; ++i) {
+        for(int j = 0; j < MAPSIZE; ++j) {
+            tileArray[i][j].revealed = true;
+        }
+    }
 }
 
 //Read in the map
@@ -182,7 +188,7 @@ bool Map::loadOccupants(string src) {
       // Read tileOccupant type string (without trailing
       // whitespace)
       getline(fin, temp);
-      string type = temp.erase(temp.find_last_not_of(" \n\t"));
+      string type = temp.erase(temp.find_last_not_of(" \t") + 1);
 
       // Read tileOccupant data as comma-separated values
       getline(fin, temp);

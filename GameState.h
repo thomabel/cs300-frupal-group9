@@ -17,7 +17,7 @@ class GameState
 {
 	public:
 		
-		GameState();
+		GameState(string mapFile = "Frupal.txt");
 		~GameState();
 		
 		void travel(int & direction, WINDOW * win);

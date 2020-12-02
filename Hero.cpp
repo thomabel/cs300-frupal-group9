@@ -10,8 +10,8 @@ Hero::Hero(){
     hasBinoculars_ = false;
     hasShip_ = false;
     whiffles_ = 1000;
-    energy_ = 100;
-    //energy_ = 10000;
+    //energy_ = 100;
+    energy_ = 10000;
 }
 
 Hero::Hero(const  Hero & orig){
@@ -22,12 +22,28 @@ Hero::Hero(const  Hero & orig){
     this->energy_ = orig.energy_;
 }
 
-/*
-vector<Tool*> Hero::GetInventory()
+
+vector<vector<string>> Hero::GetInventory()
 {
-	return inventory_;
+    vector<vector<string>> options;
+
+    for (unsigned int i = 0; i < inventory_.size(); ++i) {
+        // Get the details of the 
+        vector<string> details = inventory_.at(i)->getDetails();
+
+        // Put the name of the tool in the right column
+        details.at(details.size()/2) = details.at(0);
+        
+        // Set the left column to the choice for selecting it
+        details.at(0) = string(1, choiceIndexToChar(i));
+
+        // Add the details array to the array of details arrays
+        options.push_back(details);
+    }
+    
+    return options;
 }
-*/
+
 
 //returns list of tools usable on Obstacle
 vector<Tool*> Hero::getUsableTools(Obstacle &current){
