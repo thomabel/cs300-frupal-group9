@@ -25,10 +25,10 @@ Map::Map(string srcFile, int & heroX, int & heroY)
     getmaxyx(stdscr,MaxScreenY,MenuBorder);
 
     MaxY = MaxScreenY;
-    if(MenuBorder > (MAPSIZE * 2))
+    if(MenuBorder > 170)
 	    MenuBorder = MAPSIZE;
     else
-	    MenuBorder = MenuBorder - (MenuBorder/2);
+	    MenuBorder = MenuBorder - (3*MenuBorder/10);
 
     MaxX = MenuBorder;
     
@@ -41,9 +41,9 @@ Map::Map(string srcFile, int & heroX, int & heroY)
 	}
 
 	if(!(loadOccupants("exampleOccupantFile.txt")))
-  {
+    {
           throw runtime_error("File cannot open");
-  }
+    }
 }
 
 //Read in the map
@@ -158,6 +158,7 @@ bool Map::loadFile(string src, int & heroX, int & heroY)
   return true; // placeholder for better things
 }
 
+        
 bool Map::loadOccupants(string src) {
   string temp;
 
@@ -166,30 +167,31 @@ bool Map::loadOccupants(string src) {
   fin.open(src);
 
   if (fin) {
-    getline(fin, temp);
-    int qty = stoi(temp);
+    // Convert the file to a vector of strings
+    vector<string> contents = inputFile(src); 
 
-    for (int i = 0; i < qty; ++i) {
-      // Discard whitespace line
-      getline(fin, temp);
+    // Remove empty lines and comments
+    contents = cleanFile(contents);
+
+    // The first (used) line must be the occupant count
+    int qty = stoi(contents[0]);
+
+    for (int i = 1; i <= qty; ++i) {
+      // Convert line to stream 
+      stringstream thisLine(contents[i]);
 
       // Read coordinates of tileOccupant
-      getline(fin, temp, ',');
-      int row = stoi(temp);
-      getline(fin, temp);
+      getline(thisLine, temp, ',');
       int col = stoi(temp);
+      getline(thisLine, temp, ',');
+      int row = stoi(temp);
 
-      // Read tileOccupant type string (without trailing
-      // whitespace)
-      getline(fin, temp);
-      string type = temp.erase(temp.find_last_not_of(" \n\t"));
+      // Read tileOccupant type string (without trailing whitespace)
+      getline(thisLine, temp, ',');
+      string type = temp;
 
       // Read tileOccupant data as comma-separated values
-      getline(fin, temp);
-
-      // Quit and fail if there were issues with the stream
-      if (!fin)
-        return false;
+      getline(thisLine, temp);
 
       // If the tile already has an occupant, remove it.
      
@@ -268,8 +270,8 @@ bool Map::saveOccupants(string dest) {
 
     for (unsigned int i = 0; i < occupants.size(); ++i) {
       fout << "\n"
-           << rows[i] << "," << cols[i] << "\n"
-           << occupants[i]->typeStr() << "\n"
+           << rows[i] << "," << cols[i] << ","
+           << occupants[i]->typeStr() << ","
            << occupants[i]->dataAsCsv() << "\n";
     }
   } else {
@@ -289,6 +291,14 @@ TileOccupant *Map::occupantAt(int col, int row) {
 // Reveal the tile(Discovered)
 void Map::tile_revealed(int row, int col) {
   tileArray[row][col].revealed = true;
+}
+
+void Map::revealAll() {
+  for(int i = 0; i < MAPSIZE; ++i) {
+    for(int j = 0; j < MAPSIZE; ++j) {
+      tileArray[i][j].revealed = true;
+    }
+  }
 }
 
 // Remove a tileOccupant, typicaly after it is bought/consumed/looted

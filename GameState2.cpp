@@ -11,10 +11,7 @@ GameState::GameState(string mapFile) : map(mapFile, heroX, heroY) {
   cursorX = heroX;
 
   cursorY = heroY;
-  
-  int x;
-  x = getmaxx(stdscr);
-  UI.initialize(3*x/10);
+  UI.initialize(map.MenuBorder);
   message = {"E, I",  "S, J", "D, K",  "F, L", "H",
              "NORTH", "WEST", "SOUTH", "EAST", "INVENTORY"};
 }
@@ -312,10 +309,6 @@ void GameState::HeroVision(int tempHeroY, int tempHeroX) {
         checkJ = j + 1;
     }
   }
-}
-
-void GameState::revealMap() {
-    map.revealAll();
 }
 
 // Inspect tiles with cursor
