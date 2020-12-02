@@ -38,6 +38,7 @@ class GameState
 		Hero theHero;
 		Map map;
 		UserInterface UI;
+		vector<string> message;
 		int cursorX;
 		int cursorY;
 		int heroX;

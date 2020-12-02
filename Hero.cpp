@@ -11,6 +11,7 @@ Hero::Hero(){
     hasShip_ = false;
     whiffles_ = 1000;
     energy_ = 100;
+    //energy_ = 10000;
 }
 
 Hero::Hero(const  Hero & orig){
@@ -20,6 +21,13 @@ Hero::Hero(const  Hero & orig){
     this->whiffles_ = orig.whiffles_;
     this->energy_ = orig.energy_;
 }
+
+/*
+vector<Tool*> Hero::GetInventory()
+{
+	return inventory_;
+}
+*/
 
 //returns list of tools usable on Obstacle
 vector<Tool*> Hero::getUsableTools(Obstacle &current){
