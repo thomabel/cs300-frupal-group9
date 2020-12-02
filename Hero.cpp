@@ -28,6 +28,7 @@ vector<Tool*> Hero::GetInventory()
 	return inventory_;
 }
 */
+
 //returns list of tools usable on Obstacle
 vector<Tool*> Hero::getUsableTools(Obstacle &current){
     vector<Tool*> usableTools_;

@@ -50,13 +50,14 @@ class Map
 		Map() = delete;
 		Map(string srcFile, int & heroX, int & heroY);
 
-		TileType * tileTypeAt(int row, int col);
-		TileOccupant * occupantAt(int row, int col);
-		void setOccupantAt(int row, int col, TileOccupant* newOccupant);
+		TileType * tileTypeAt(int col, int row);
+		TileOccupant * occupantAt(int col, int row);
+
+		void setOccupantAt(int col, int row, TileOccupant* newOccupant);
 
 		void tile_revealed(int row, int col);
 
-		bool isTileDiscovered(int row, int col);
+		bool isTileDiscovered(int col, int row);
 
 		void displayMap(WINDOW * win);
 

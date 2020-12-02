@@ -41,9 +41,9 @@ Map::Map(string srcFile, int & heroX, int & heroY)
 	}
 
 	if(!(loadOccupants("exampleOccupantFile.txt")))
-        {
-                throw runtime_error("File cannot open");
-        }
+  {
+          throw runtime_error("File cannot open");
+  }
 }
 
 //Read in the map
@@ -66,6 +66,8 @@ bool Map::loadFile(string src, int & heroX, int & heroY)
                 infile.ignore(100,',');
                 infile>>heroY;
                 infile.ignore(100,'\n');
+          
+          /*
                 //If end of file is not triggered then enter the loop
                 while(getline(infile,temp))
                 {
@@ -105,10 +107,48 @@ bool Map::loadFile(string src, int & heroX, int & heroY)
 
                 }
                 infile.close();
+
 	} 
 	else {
 	  return false;
 	}
+  */
+
+    // If end of file is not triggered then enter the loop
+    while (getline(infile, temp)) {
+      for (unsigned int k = 0; k < temp.size(); ++k) {
+
+        if (j == MAPSIZE) {
+          ++i;
+          j = 0;
+        }
+
+        switch (temp[k]) {
+        case 'W':
+          tileArray[i][j].type = new Water; // Color num 4
+          break;
+        case 'M':
+          tileArray[i][j].type = new Wall; // Color num 7
+          break;
+        case 'S':
+          tileArray[i][j].type = new Swamp; // Color num 5
+          break;
+        case 'G':
+          tileArray[i][j].type = new Meadow; // Color num 2
+          break;
+        }
+
+        ++j;
+
+        // How should we go about occupants?
+      }
+    }
+    infile.close();
+
+  } else {
+    return false;
+  }
+  
   /*
   attron(COLOR_PAIR(5));
   mvwprintw(win,5 ,5," ");
@@ -263,9 +303,10 @@ void Map::setOccupantAt(int col, int row, TileOccupant* newOccupant) {
 
 // Have we been at tile before
 bool Map::isTileDiscovered(int col, int row) {
-  if (tileArray[row][col].revealed)
+  if (tileArray[row][col].revealed) {
     return true;
-
+  }
+  
   return false;
 }
 
@@ -283,10 +324,12 @@ void Map::displayMap(WINDOW *win) {
 
         if (tileArray[i][j].occupant != NULL &&
             tileArray[i][j].occupant->typeStr() == "Diamond") {
+
           wattron(win,COLOR_PAIR(1));
           mvwprintw(win, i - MinY, j - MinX, MarkerDisplay.data());
         } else {
           wattron(win,COLOR_PAIR(tileArray[i][j].type->color()));
+
           mvwprintw(win, i - MinY, j - MinX, MarkerDisplay.data());
         }
       }

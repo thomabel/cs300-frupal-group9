@@ -10,6 +10,7 @@ GameState::GameState(): map("Frupal.txt", heroX, heroY)
 	
 	//Should start at Hero position
 	cursorX = heroX;
+
 	cursorY = heroY;
 	UI.initialize(map.MenuBorder);
 	message = {"E", "S", "D", "F", "H",
@@ -63,6 +64,7 @@ void GameState::travel(int & direction, WINDOW * win)
 	wrefresh(win);
 
   // Should start at Hero position
+  
   //cursorX = heroX;
   //cursorY = heroY;
 }
@@ -508,6 +510,74 @@ bool GameState::ExpandMap() {
 
     if (map.MinX != 0) {
 
+/*
+    temp = heroY + map.MinY;
+
+    map.MinY = map.MaxY - (map.MaxScreenY / 2);
+    map.MaxY = map.MaxY + (map.MaxScreenY / 2);
+
+    // Account for ODD #
+    if (map.MaxY - map.MinY < map.MaxScreenY)
+      ++map.MaxY;
+
+    if (map.MaxY > (map.MAPSIZE - 1)) {
+      map.MaxY = map.MAPSIZE;
+      map.MinY = map.MAPSIZE - map.MaxScreenY;
+    }
+
+    heroY = abs((temp - map.MinY));
+    heroX = heroX;
+    return true;
+
+  }
+  // Go back up
+  else if (heroY == -1) {
+    ++heroY;
+    temp = heroY + map.MinY;
+
+    map.MinY -= (map.MaxScreenY / 2);
+    map.MaxY -= (map.MaxScreenY / 2);
+
+    if (map.MinY <= -1) {
+      map.MaxY = map.MaxScreenY;
+      map.MinY = 0;
+    }
+
+    heroY = abs((temp - map.MinY));
+    heroX = heroX;
+    return true;
+
+  }
+
+  // Explore right
+  else if (heroX == map.MenuBorder) {
+    --heroX;
+
+    temp = heroX + map.MinX;
+
+    map.MinX = map.MaxX - (map.MenuBorder / 2);
+    map.MaxX = map.MaxX + (map.MenuBorder / 2);
+
+    // Account for ODD #
+    if (map.MaxX - map.MinX < map.MenuBorder)
+      ++map.MaxX;
+
+    if (map.MaxX > (map.MAPSIZE - 1)) {
+      map.MaxX = map.MAPSIZE;
+      map.MinX = map.MAPSIZE - map.MenuBorder;
+    }
+
+    heroX = abs(temp - map.MinX);
+    heroY = heroY;
+    return true;
+  }
+
+  // explore left
+  else if (heroX == -1) {
+    ++heroX;
+
+    if (map.MinX != 0) {
+*/
       temp = heroX + map.MinX;
 
       map.MinX -= (map.MenuBorder / 2);
