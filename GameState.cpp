@@ -9,11 +9,37 @@ GameState::GameState(): map("Frupal.txt", heroX, heroY)
         //heroY =0;
 	
 	//Should start at Hero position
-	cursorX = heroX;
-	cursorY = heroY;
+	//cursorX = heroX;
+	//cursorY = heroY;
 	UI.initialize(map.MenuBorder);
 	message = {"E", "S", "D", "F", "H",
     "NORTH", "WEST", "SOUTH", "EAST", "INVENTORY"};
+	while(map.MaxX <= heroX)
+        {       
+                map.MinX = map.MaxX - (map.MenuBorder / 2);
+                map.MaxX = map.MaxX + (map.MenuBorder / 2);
+                if (map.MaxX > (map.MAPSIZE - 1)) {
+                        map.MaxX = map.MAPSIZE;
+                        map.MinX = map.MAPSIZE - map.MenuBorder;
+                }
+        }
+        while(map.MaxY <= heroY)
+        {       
+                map.MinY = map.MaxY - (map.MaxScreenY/ 2);
+                map.MaxY = map.MaxY + (map.MaxScreenY/ 2);
+
+		if (map.MaxY > (map.MAPSIZE - 1)) {
+			map.MaxY = map.MAPSIZE;
+			map.MinY = map.MAPSIZE - map.MaxScreenY;
+		}
+                
+        }
+
+	heroX = abs(heroX - map.MinX);
+	heroY = abs(heroY - map.MinY);
+	cursorX = heroX;
+        cursorY = heroY;
+	
 }
 
 GameState::~GameState()
@@ -197,8 +223,8 @@ bool GameState::HeroTravel(int & direction)
                                                         direction = 'q';
                                                         return false;
                                                 }
-						occupantCheck(direction);
-						return true;
+						return occupantCheck(direction);
+						
 
 					}
                                         else
@@ -235,7 +261,6 @@ bool GameState::occupantCheck(int &direction) {
   // Not NULL, we have an occupant
   if (occ) {
     char response = 0;
-
     // Keep prompting user until they provide a valid response.
     do {
       /* Give the user the appropriate pop-up for the encounter.
@@ -263,8 +288,9 @@ bool GameState::occupantCheck(int &direction) {
     /* End the game if the Hero found a diamond. The user has been
      * notified via pop-up already.
      */
+    
     if (occ->typeStr() == "Diamond") {
-      direction = 'w'; // 'w' for "win"? Or is that what "return true" is for?
+      direction = 'q';
       return false;
     }
 
@@ -535,6 +561,8 @@ void GameState::RunGame(WINDOW * win)
 	UI.whifflesEnergy(theHero.whiffles(), theHero.energy());
 	wattron(win,COLOR_PAIR(6));
 	mvwprintw(win,heroY, heroX, "@");
+	cursorTravel(choice);
+	UI.actions(message);
 	wmove(win,cursorY, cursorX);
 	wrefresh(win);
 
@@ -542,5 +570,6 @@ void GameState::RunGame(WINDOW * win)
 	{
 		choice = wgetch(stdscr);
 		travel(choice,win);
+		
 	}
 }

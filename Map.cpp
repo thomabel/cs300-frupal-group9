@@ -35,15 +35,26 @@ Map::Map(string srcFile, int & heroX, int & heroY)
     MinX = 0;
     MinY = 0;
 
+
 	if(!(loadFile(srcFile, heroX, heroY)))
 	{
 		throw runtime_error("File cannot open");
 	}
-
+	/*
 	if(!(loadOccupants("exampleOccupantFile.txt")))
         {
                 throw runtime_error("File cannot open");
         }
+	*/
+	tileArray[118][104].occupant = new Binoculars;
+	/*
+	for(int i = 0; i<MAPSIZE; ++i)
+		for(int j = 0; j<MAPSIZE; ++j)
+			tileArray[i][j].revealed = true;
+
+	*/
+
+
 }
 
 //Read in the map
@@ -135,9 +146,9 @@ bool Map::loadOccupants(string src) {
 
       // Read coordinates of tileOccupant
       getline(fin, temp, ',');
-      int row = stoi(temp);
-      getline(fin, temp);
       int col = stoi(temp);
+      getline(fin, temp);
+      int row = stoi(temp);
 
       // Read tileOccupant type string (without trailing
       // whitespace)
@@ -277,9 +288,12 @@ void Map::displayMap(WINDOW *win) {
     for (int j = MinX; j < MaxX; ++j) {
       if (tileArray[i][j].revealed) {
         if (tileArray[i][j].occupant)
+	{
           MarkerDisplay = string(1, tileArray[i][j].occupant->marker());
-        else
+	}
+        else{
           MarkerDisplay = " ";
+	}
 
         if (tileArray[i][j].occupant != NULL &&
             tileArray[i][j].occupant->typeStr() == "Diamond") {
