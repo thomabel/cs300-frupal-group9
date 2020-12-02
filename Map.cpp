@@ -44,12 +44,6 @@ Map::Map(string srcFile, int & heroX, int & heroY)
     {
           throw runtime_error("File cannot open");
     }
-
-    for(int i = 0; i < MAPSIZE; ++i) {
-        for(int j = 0; j < MAPSIZE; ++j) {
-            tileArray[i][j].revealed = true;
-        }
-    }
 }
 
 //Read in the map
@@ -188,9 +182,9 @@ bool Map::loadOccupants(string src) {
 
       // Read coordinates of tileOccupant
       getline(thisLine, temp, ',');
-      int row = stoi(temp);
-      getline(thisLine, temp, ',');
       int col = stoi(temp);
+      getline(thisLine, temp, ',');
+      int row = stoi(temp);
 
       // Read tileOccupant type string (without trailing whitespace)
       getline(thisLine, temp, ',');
@@ -276,8 +270,8 @@ bool Map::saveOccupants(string dest) {
 
     for (unsigned int i = 0; i < occupants.size(); ++i) {
       fout << "\n"
-           << rows[i] << "," << cols[i] << "\n"
-           << occupants[i]->typeStr() << "\n"
+           << rows[i] << "," << cols[i] << ","
+           << occupants[i]->typeStr() << ","
            << occupants[i]->dataAsCsv() << "\n";
     }
   } else {
@@ -297,6 +291,14 @@ TileOccupant *Map::occupantAt(int col, int row) {
 // Reveal the tile(Discovered)
 void Map::tile_revealed(int row, int col) {
   tileArray[row][col].revealed = true;
+}
+
+void Map::revealAll() {
+  for(int i = 0; i < MAPSIZE; ++i) {
+    for(int j = 0; j < MAPSIZE; ++j) {
+      tileArray[i][j].revealed = true;
+    }
+  }
 }
 
 // Remove a tileOccupant, typicaly after it is bought/consumed/looted

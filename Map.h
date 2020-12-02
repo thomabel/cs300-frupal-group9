@@ -56,6 +56,7 @@ class Map
 		void setOccupantAt(int col, int row, TileOccupant* newOccupant);
 
 		void tile_revealed(int row, int col);
+        void revealAll();
 
 		bool isTileDiscovered(int col, int row);
 

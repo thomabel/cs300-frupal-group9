@@ -314,6 +314,10 @@ void GameState::HeroVision(int tempHeroY, int tempHeroX) {
   }
 }
 
+void GameState::revealMap() {
+    map.revealAll();
+}
+
 // Inspect tiles with cursor
 void GameState::cursorTravel(int direction) {
   TileType *temp_type = NULL;
