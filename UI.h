@@ -44,6 +44,11 @@ private:
     const std::string LABEL_Actions = "~Actions~";
     const std::string LABEL_Inspect = "~Inspect~";
 
+    void clearInspect();
+    // Popup helpers
+    void openPop();
+    void closePop();
+
     // Printing Functions
     void printTitle(
         WINDOW *win, 
