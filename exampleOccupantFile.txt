@@ -17,7 +17,7 @@
 96,90,Treasure,50
 91,81,Donut,8,4
 88,98,Ham,14,12
-104,110,Tool,Handful of Salt,50,10,1,Passive Agressive Slugs
+104,110,Tool,Handful of Salt,50,10,1,Passive-Agressive Slugs
 
 95,100,Obstacle,Passive-Agressive Slugs,10
 121,105,Obstacle,Passive-Agressive Slugs,10
@@ -32,7 +32,7 @@
 125,86,Treasure,50
 122,87,Ice-Cold Beer,30,25
 125,84,Ham,14,12
-124,87,Tool,Handful of Salt,50,10,1,Passive Agressive Slugs
+124,87,Tool,Handful of Salt,50,10,1,Passive-Agressive Slugs
 
 85,101,Treasure,50
 79,122,Treasure,25
