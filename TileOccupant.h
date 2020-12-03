@@ -40,7 +40,6 @@ class TileOccupant
 	protected:
 };
 
-
 class Treasure: public TileOccupant
 {
 	public:
@@ -74,27 +73,28 @@ class Ship: public TileOccupant
 	protected:
 		int whiffleCost_;
 		bool bought_;
+        bool toRemove_;
 };
 
 class Obstacle : public TileOccupant
 {
-public:
-    Obstacle() = delete;
-    Obstacle(string name, int energyCost);
+    public:
+        Obstacle() = delete;
+        Obstacle(string name, int energyCost);
 
-    string name() const;
-    string promptMsg(Hero& theHero) override;
-    bool interact(char promptResponse, Hero& theHero) override;
-    bool permanent() override;
-    int color() override;
-    char marker() override;
-    vector<string> getDetails() override;
-    string typeStr() const override;
-    string dataAsCsv() const override;
+        string name() const;
+        string promptMsg(Hero& theHero) override;
+        bool interact(char promptResponse, Hero& theHero) override;
+        bool permanent() override;
+        int color() override;
+        char marker() override;
+        vector<string> getDetails() override;
+        string typeStr() const override;
+        string dataAsCsv() const override;
 
-private:
-    string name_;
-    int energyCost_;
+    private:
+        string name_;
+        int energyCost_;
 };
 
 class Tool: public TileOccupant
