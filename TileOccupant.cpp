@@ -247,15 +247,19 @@ Return:		string - message to display to player
 */
 string Ship::promptMsg(Hero& theHero)
 {
-	string msg;
+    if(theHero.hasShip())
+    {
+        return string("You can't board this ship since you are already")
+            + "riding one! ";
+    }
 
 	if(bought_)
 	{
-		msg = "Welcome back! Sail in ship? (Y/N):";
-        return msg;
+		return string("Welcome back! Sail in ship? (Y/N)");
 	}	
 	
-	msg = "A ship has been found! ";
+	string msg = "A ship has been found! ";
+
 	if(theHero.whiffles() < whiffleCost_)
 	{
 		msg = msg + "But you don't have enough Whiffles!"
@@ -280,8 +284,11 @@ Return:		none
 */
 bool Ship::interact(char promptResponse, Hero& theHero)
 {
-    // If the hero cannot afford the ship, and the ship is new ...
-	if(theHero.whiffles() < whiffleCost_ && !bought_)
+    /* If the hero is already riding a ship, or cannot afford the ship and
+     * the ship is new ...
+     */
+	if( (theHero.whiffles() < whiffleCost_ && !bought_) ||
+        theHero.hasShip() )
     {
         // ... do nothing. Any input is valid, so return true.
 	    return true;
