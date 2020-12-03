@@ -21,15 +21,10 @@ class GameState
 		~GameState();
 		
 		void travel(int & direction, WINDOW * win);
-
 		void cursorTravel(int direction);
-
 		bool HeroTravel(int & direction);
-
 		bool ExpandMap();
-
 		bool occupantCheck(int & direction);
-
 		void HeroVision();
 		void HeroVision(int tempHeroY, int tempHeroX);
         void revealMap();
