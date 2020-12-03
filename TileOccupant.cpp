@@ -946,8 +946,7 @@ Return:		string - message to display
 */
 string Diamond::promptMsg(Hero& theHero)
 {
-	//string msg = "Congratulations! You've found the Royal Diamonds!";
-	string msg = "YOU ARE THE CONQUEROR OF FRUPAL!!!! You have found the ROYAL DIAMOND!! YOU are a ZILLIONARE WHOO-HOO !!!";
+	string msg = "Congratulations! You've found the Royal Diamonds!";
 	return msg;
 }
 

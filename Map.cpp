@@ -35,11 +35,15 @@ Map::Map(string srcFile, int & heroX, int & heroY)
     MinX = 0;
     MinY = 0;
 
-
 	if(!(loadFile(srcFile, heroX, heroY)))
 	{
 		throw runtime_error("File cannot open");
 	}
+
+	if(!(loadOccupants("exampleOccupantFile.txt")))
+    {
+          throw runtime_error("File cannot open");
+    }
 }
 
 //Read in the map
@@ -180,7 +184,6 @@ bool Map::loadOccupants(string src) {
       getline(thisLine, temp, ',');
       int col = stoi(temp);
       getline(thisLine, temp, ',');
-      
       int row = stoi(temp);
 
       // Read tileOccupant type string (without trailing whitespace)
@@ -325,12 +328,9 @@ void Map::displayMap(WINDOW *win) {
     for (int j = MinX; j < MaxX; ++j) {
       if (tileArray[i][j].revealed) {
         if (tileArray[i][j].occupant)
-	{
           MarkerDisplay = string(1, tileArray[i][j].occupant->marker());
-	}
-        else{
+        else
           MarkerDisplay = " ";
-	}
 
         if (tileArray[i][j].occupant != NULL &&
             tileArray[i][j].occupant->typeStr() == "Diamond") {
