@@ -175,11 +175,12 @@ string Treasure::dataAsCsv() const
 
 
 
-Ship::Ship() : whiffleCost_(0), bought_(false)
+Ship::Ship() : whiffleCost_(0), bought_(false), toRemove_(false)
 {
 }
 
-Ship::Ship(int whiffleCost, bool bought) : whiffleCost_(whiffleCost), bought_(bought)
+Ship::Ship(int whiffleCost, bool bought) : whiffleCost_(whiffleCost), 
+    bought_(bought), toRemove_(false)
 {
 }
 
@@ -191,7 +192,7 @@ Return:		none
 */
 bool Ship::permanent()
 {
-	return !bought_;
+	return !toRemove_;
 }
 
 /*
@@ -251,6 +252,7 @@ string Ship::promptMsg(Hero& theHero)
 	if(bought_)
 	{
 		msg = "Welcome back! Sail in ship? (Y/N):";
+        return msg;
 	}	
 	
 	msg = "A ship has been found! ";
@@ -278,27 +280,30 @@ Return:		none
 */
 bool Ship::interact(char promptResponse, Hero& theHero)
 {
-	if(bought_)
-	{
-		theHero.setHasShip(true);
-		return true;
-	}
-	else if(theHero.whiffles() < whiffleCost_)
-		return true;
-
-    if (!TileOccupant::interact(promptResponse, theHero))
+    // If the hero cannot afford the ship, and the ship is new ...
+	if(theHero.whiffles() < whiffleCost_ && !bought_)
     {
-        return false;
+        // ... do nothing. Any input is valid, so return true.
+	    return true;
     }
 
-	if(promptResponse == 'y' || promptResponse == 'Y')
-	{
-		theHero.addWhiffles(-whiffleCost_);
-		theHero.setHasShip(true);
-        bought_ = true;
-	}
+    // The user chose to purchase or use the ship
+    if (promptResponse == 'y' || promptResponse == 'Y')
+    {
+        // Price is paid only once.
+        if(!bought_)
+        {
+            theHero.addWhiffles(-whiffleCost_);
+            bought_ = true;
+        }
 
-    return true;
+        toRemove_ = true;
+        theHero.setHasShip(true);
+        return true;
+    }
+
+    // Verify that the user chose to not purchase the ship.
+    return TileOccupant::interact(promptResponse, theHero);
 }
 
 string Ship::typeStr() const
