@@ -147,9 +147,8 @@ char UserInterface::displayInventory(
         }
         // Scroll downwards.
         else if (ch == CTRL_DOWN){
-            ist += 1;
-            if (ist >= ts)
-                ist = ts - 1; 
+            if (ist < ts)
+              ist++;
         }
         else if (getInput && ch != CTRL_INV){
             break;
