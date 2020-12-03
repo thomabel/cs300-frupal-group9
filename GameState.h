@@ -12,7 +12,6 @@
 #include"UI.h"
 
 //Map coordinates (within array)
-//Hi
 class GameState
 {
 	public:
