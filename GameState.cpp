@@ -198,6 +198,7 @@ bool GameState::occupantCheck(int &direction) {
    */
   bool debarkShip = (theHero.hasShip() && type->toString() != "Water");
 
+
   // Not NULL, we have an occupant
   if (occ) {
     char response = 0;
@@ -227,7 +228,7 @@ bool GameState::occupantCheck(int &direction) {
      * notified via pop-up already.
      */
     if (occ->typeStr() == "Diamond") {
-      direction = 'w'; // 'w' for "win"? Or is that what "return true" is for?
+      direction = 'w'; 
       return false;
     }
 
