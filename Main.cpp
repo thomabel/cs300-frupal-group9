@@ -1,10 +1,14 @@
-#include"GameState.h"
-int main()
+#include "GameState.h"
+#include <iostream>
+
+int main(int argc, char** argv)
 {
 	initscr();
 	noecho();
 	keypad(stdscr, true);
 	start_color();
+
+    //getch();
 
 	init_pair(1, COLOR_WHITE, COLOR_CYAN);
 	init_pair(2, COLOR_BLACK, COLOR_GREEN);
@@ -14,9 +18,22 @@ int main()
         init_pair(6, COLOR_YELLOW, COLOR_RED);
         init_pair(7, COLOR_BLACK, COLOR_WHITE);
 
-	GameState Game;
+	if (argc == 1) {
+        GameState Game;
+        Game.RunGame(stdscr);
+    } else {
+        GameState Game(argv[1]);
 
-	Game.RunGame(stdscr);
+        // Remove this to remove cheat
+        if (argc >= 3) {
+               Game.revealMap();
+        }
+
+        Game.RunGame(stdscr);
+    }
+
+
+
 
 	endwin();
 

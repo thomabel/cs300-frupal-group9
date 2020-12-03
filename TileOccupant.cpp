@@ -7,6 +7,7 @@ Description:
 */
 
 #include "TileOccupant.h"
+#include <cmath>
 
 using namespace std;
 
@@ -260,9 +261,9 @@ string Ship::promptMsg(Hero& theHero)
 	}
 	else
 	{
-		msg = msg + "Purchase ship for " 
-			+ to_string(whiffleCost_)
-			+ " Whiffles?(Y/N):";
+		msg = msg + "Purchase? (Y/N)";// ship for " 
+			// + to_string(whiffleCost_)
+			// + " Whiffles?(Y/N):";
 	}
 	return msg;
 }
@@ -279,7 +280,7 @@ bool Ship::interact(char promptResponse, Hero& theHero)
 {
 	if(bought_)
 	{
-		theHero.setHasShip(true);;
+		theHero.setHasShip(true);
 		return true;
 	}
 	else if(theHero.whiffles() < whiffleCost_)
@@ -293,7 +294,7 @@ bool Ship::interact(char promptResponse, Hero& theHero)
 	if(promptResponse == 'y' || promptResponse == 'Y')
 	{
 		theHero.addWhiffles(-whiffleCost_);
-		theHero.setHasShip(true);;
+		theHero.setHasShip(true);
         bought_ = true;
 	}
 
@@ -443,7 +444,7 @@ string Tool::promptMsg(Hero& theHero)
 	msg = "Tool found!\n";
 	if(theHero.whiffles() >= whiffleCost_)
 	{
-		msg = msg + name_ + "\n";
+		/* msg = msg + name_ + "\n";
 		// get all obstacles tool works for
 		for (auto it = forObstacles.begin()
 			; it != forObstacles.end(); ++it)
@@ -454,9 +455,9 @@ string Tool::promptMsg(Hero& theHero)
 		// get tool cost and rating
 		msg = msg + to_string(whiffleCost_) + " : Cost\n";
 		msg = msg + "X" + to_string(rating_) 
-			+ " : Rating\n";
+			+ " : Rating\n"; */
 	
-		msg = msg + "Purchase? (Y/N):";
+		msg = msg + "Would you like to purchase? (Y/N):";
 	}
 	else
 	{
@@ -596,18 +597,15 @@ string Food::promptMsg(Hero& theHero)
 {
 	string msg;
 
-	msg = "Food found!\n";
+	msg = string("You found a delicious ") + name_ + "!";
+
 	if(theHero.whiffles() >= whiffleCost_)
 	{
-		msg = msg + name_ + "\n"
-			+ to_string(whiffleCost_) + " : Cost\n"
-			+ to_string(energyProvided_) + " : Energy\n";	
-
-		msg = msg + "Purchase? (Y/N):";
+        msg = msg +  " Would you like to purchase (Y/N)?\n";
 	}
 	else
 	{
-		msg = msg + "But you don't have enough Whiffles! "
+		msg = msg + " But you don't have enough Whiffles! "
 			+ "Sorry!";
 	}
 	return msg;
@@ -839,9 +837,9 @@ vector<string> Clue::getDetails()
 {
 	vector<string> data;
 	data.push_back("");
-	data.push_back(msg_);
+	//data.push_back(msg_);
 	data.push_back("Clue");
-	data.push_back("Message");
+	//data.push_back("Message");*/
 	return data;
 }
 
@@ -948,8 +946,7 @@ Return:		string - message to display
 */
 string Diamond::promptMsg(Hero& theHero)
 {
-	//string msg = "Congratulations! You've found the Royal Diamonds!";
-	string msg = "YOU ARE THE CONQUEROR OF FRUPAL!!!! You have found the ROYAL DIAMOND!! YOU are a ZILLIONARE WHOO-HOO !!!";
+	string msg = "Congratulations! You've found the Royal Diamonds!";
 	return msg;
 }
 
@@ -1007,7 +1004,7 @@ bool Obstacle::interact(char promptResponse, Hero& theHero)
     int toolInd = charToChoiceIndex(promptResponse);
 
     // Check if the promptResponse is invalid.
-    if ((toolInd < 0 && toolInd >= static_cast<int>(usableTools.size())) && 
+    if ((toolInd < 0 || toolInd >= static_cast<int>(usableTools.size())) && 
         promptResponse != ' ') {
         return false;
     }
@@ -1022,8 +1019,8 @@ bool Obstacle::interact(char promptResponse, Hero& theHero)
             throw std::runtime_error("missing tool");
 
         // Cost is reduced by a factor of the rating, rounding up.
-        energyCost_ /= chosenTool->rating();
-        energyCost_++;
+        energyCost_ = ceil(static_cast<float>(energyCost_) / 
+            chosenTool->rating());
 
         // Remove the tool from the Hero's inventory.
         theHero.consumeTool(chosenTool);
