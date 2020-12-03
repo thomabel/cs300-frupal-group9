@@ -190,16 +190,13 @@ bool GameState::occupantCheck(int &direction) {
    */
   int r = heroX + map.MinX;
   int c = heroY + map.MinY;
-  TileType *tileType = map.tileTypeAt(r, c);
+  TileType *type = map.tileTypeAt(r, c);
   TileOccupant *occ = map.occupantAt(r, c);
 
   /* If the hero is leaving water, then they leave their ship on the shore.
    * Since this ship was already purchased, it has no cost.
    */
-  if (theHero.hasShip() && tileType->toString() != "Water") {
-    map.setOccupantAt(r, c, new Ship(0, true));
-    theHero.setHasShip(false);
-  }
+  bool debarkShip = (theHero.hasShip() && type->toString() != "Water");
 
   // Not NULL, we have an occupant
   if (occ) {
@@ -207,11 +204,6 @@ bool GameState::occupantCheck(int &direction) {
 
     // Keep prompting user until they provide a valid response.
     do {
-      /* Give the user the appropriate pop-up for the encounter.
-       * TileOccupant::promptMsg() will give an appropriate message if
-       * the user cannot afford an item.
-       */
-
       // If encountering an Obstacle, the user needs to see their tool choices.
       if (occ->typeStr() == "Obstacle") {
         Obstacle *o = dynamic_cast<Obstacle *>(occ);
@@ -243,8 +235,17 @@ bool GameState::occupantCheck(int &direction) {
      * If not, remove it from the map.
      */
     if (!occ->permanent()) {
-      map.setOccupantAt(r, c, 0);
+      map.setOccupantAt(r, c, 0); // also deletes.
+      occ = 0;
     }
+  }
+
+  /* The ship can only be placed if there isn't already a TileOccupant. Do not
+   * use 'else'! The previous if statement modifies occ.
+   */
+  if(debarkShip && !occ) {
+    map.setOccupantAt(r, c, new Ship(0, true));
+    theHero.setHasShip(false);
   }
 
   return true;
