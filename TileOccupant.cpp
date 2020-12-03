@@ -232,7 +232,7 @@ vector<string> Ship::getDetails()
 	else
 		data.push_back("False");
 	data.push_back("Ship");
-	data.push_back("Cost");
+	data.push_back("Price");
 	data.push_back("Bought");
 	
 	return data;
@@ -425,7 +425,7 @@ vector<string> Tool::getDetails()
 	// push labels 
 	data.push_back("Tool");
 	data.push_back("Obstacle");
-	data.push_back("Cost");
+	data.push_back("Price");
 	data.push_back("Rating");
 
 	return data;
@@ -581,7 +581,7 @@ vector<string> Food::getDetails()
 
 	// labels
 	data.push_back("Food");
-	data.push_back("Cost");
+	data.push_back("Price");
 	data.push_back("Energy");
 
 	return data;
@@ -993,40 +993,50 @@ std::string Obstacle::promptMsg(Hero& theHero)
     /* The proper operator overloads and implicit constructors are available in
      * <string> for the below statement to compile.
      */
-    return std::string("You must remove a " + name_ + " to continue. Doing"
-    + " so without a tool will consume " + std::to_string(energyCost_)
-    + " points of energy. Select a tool or press \"space\" for no tool.");
+    vector<Tool*> usableTools = theHero.getUsableTools(*this);
+    
+    if (usableTools.size() == 0) {
+        return string("You destroyed a ") + name_ + " with your bare hands! "
+            + "(You have no appropriate tools.)";
+    }
+    
+    return string("You must remove a ") + name_ + " to continue. Select a tool"
+        + " or press \"space\" for no tool.";
 }
 
 bool Obstacle::interact(char promptResponse, Hero& theHero)
 {
-    std::vector<Tool*> usableTools = theHero.getUsableTools(*this); 
+    // Get list of all tools that the user can use to break this obstacle
+    vector<Tool*> usableTools = theHero.getUsableTools(*this); 
+
+    // Convert the tool choice to an index in the tool array
     int toolInd = charToChoiceIndex(promptResponse);
 
-    // Check if the promptResponse is invalid.
-    if ((toolInd < 0 || toolInd >= static_cast<int>(usableTools.size())) && 
-        promptResponse != ' ') {
+    // All input is valid if the user has no applicable tools.
+    if (usableTools.size() == 0 || promptResponse == ' ') {
+        theHero.addEnergy(-energyCost_);
+        return true;
+    }
+ 
+    // A tool was chosen. Check if the promptResponse is invalid.
+    if (toolInd < 0 || toolInd >= static_cast<int>(usableTools.size()))  {
         return false;
     }
 
-    // If a tool was chosen, calculate new energy cost and consume the tool.
-    if (promptResponse != ' ')
-    {
-        // Check if the pointer to the chosen tool is null
-        Tool *chosenTool = usableTools.at(toolInd);
+    // Check if the pointer to the chosen tool is null
+    Tool *chosenTool = usableTools.at(toolInd);
 
-        if (!chosenTool)
-            throw std::runtime_error("missing tool");
+    if (!chosenTool)
+        throw std::runtime_error("missing tool");
 
-        // Cost is reduced by a factor of the rating, rounding up.
-        energyCost_ = ceil(static_cast<float>(energyCost_) / 
-            chosenTool->rating());
-
-        // Remove the tool from the Hero's inventory.
-        theHero.consumeTool(chosenTool);
-    }
+    // Cost is reduced by a factor of the rating, rounding up.
+    energyCost_ = ceil(static_cast<float>(energyCost_) / 
+        chosenTool->rating());
 
     theHero.addEnergy(-energyCost_);
+
+    // Remove the tool from the Hero's inventory.
+    theHero.consumeTool(chosenTool);
     return true;
 
     /* Like for any other TileOccupant, the caller will remove this Obstacle
