@@ -189,7 +189,7 @@ char UserInterface::displayInventory(
 // Popup with single string
 char UserInterface::popup(std::string message){
     char ch;
-
+  
     openPop();
     printTitle(pop, 0, 0, message);
     ch = getch();

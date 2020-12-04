@@ -12,7 +12,6 @@
 #include"UI.h"
 
 //Map coordinates (within array)
-
 class GameState
 {
 	public:
@@ -27,7 +26,7 @@ class GameState
 		bool occupantCheck(int & direction);
 		void HeroVision();
 		void HeroVision(int tempHeroY, int tempHeroX);
-        void revealMap();
+    void revealMap();
 		void RunGame(WINDOW * win);
 	
 	private:
