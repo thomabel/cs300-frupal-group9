@@ -3,21 +3,36 @@
 
 GameState::GameState(string mapFile) : map(mapFile, heroX, heroY) {
   // string MapsrcFile = "Frupal.txt";
-  // Where should the player start?
-  // heroX =0;
-  // heroY =0;
-
-  // Should start at Hero position
-  cursorX = heroX;
-
-  cursorY = heroY;
   
   int x;
   x = getmaxx(stdscr);
   UI.initialize(3*x/10);
   message = {"E, I",  "S, J", "D, K",  "F, L", "H",
              "NORTH", "WEST", "SOUTH", "EAST", "INVENTORY"};
+  while(map.MaxX <= heroX){
+    map.MinX = map.MaxX - (map.MenuBorder / 2);
+    map.MaxX = map.MaxX + (map.MenuBorder / 2);
+    if (map.MaxX > (map.MAPSIZE - 1)){
+      map.MaxX = map.MAPSIZE;
+      map.MinX = map.MAPSIZE - map.MenuBorder;
+    }
+  }
+  while(map.MaxY <= heroY){
+    map.MinY = map.MaxY - (map.MaxScreenY/ 2);
+    map.MaxY = map.MaxY + (map.MaxScreenY/ 2);
+    if (map.MaxY > (map.MAPSIZE - 1)) {
+      map.MaxY = map.MAPSIZE;
+      map.MinY = map.MAPSIZE - map.MaxScreenY;
+    }
+  }
+  heroX = abs(heroX - map.MinX);
+  heroY = abs(heroY - map.MinY);
+  cursorX = heroX;
+  cursorY = heroY;
+
 }
+
+
 
 GameState::~GameState() { map.saveFile("SavedFile.txt", heroX, heroY); }
 
@@ -38,7 +53,6 @@ void GameState::travel(int &direction, WINDOW *win) {
         }
       }
     }
-
     // What the hero can see
     HeroVision();
 
@@ -47,18 +61,12 @@ void GameState::travel(int &direction, WINDOW *win) {
     UI.actions(message);
 
     UI.whifflesEnergy(theHero.whiffles(), theHero.energy());
+
+    wattron(win, COLOR_PAIR(6));
+    mvwprintw(win, heroY, heroX, "@");
   }
-
-  wattron(win, COLOR_PAIR(6));
-  mvwprintw(win, heroY, heroX, "@");
-
   wmove(win, cursorY, cursorX);
   wrefresh(win);
-
-  // Should start at Hero position
-
-  // cursorX = heroX;
-  // cursorY = heroY;
 }
 
 // The hero traveling
@@ -69,7 +77,7 @@ bool GameState::HeroTravel(int &direction) {
   // These four cases is when user wants
   // to move the Hero.
   case 'i':
-    if (heroY - 1 >= -1) {
+    if (heroY - 1 > -1) {
       if (heroY - 1 == -1)
         --heroY;
       else {
@@ -98,7 +106,7 @@ bool GameState::HeroTravel(int &direction) {
     break;
 
   case 'k':
-    if (heroY + 1 < map.MaxScreenY + 1) {
+    if (heroY + 1 < map.MaxScreenY) {
       if (heroY + 1 == map.MaxScreenY)
         ++heroY;
       else {
@@ -124,7 +132,7 @@ bool GameState::HeroTravel(int &direction) {
     break;
 
   case 'l':
-    if (heroX + 1 < map.MenuBorder + 1) {
+    if (heroX + 1 < map.MenuBorder) {
       if (heroX + 1 == map.MenuBorder)
         ++heroX;
       else {
@@ -150,7 +158,7 @@ bool GameState::HeroTravel(int &direction) {
 
     break;
   case 'j':
-    if (heroX - 1 >= -1) {
+    if (heroX - 1 > -1) {
       if (heroX - 1 == -1)
         --heroX;
       else {
@@ -163,15 +171,13 @@ bool GameState::HeroTravel(int &direction) {
             direction = 'q';
             return false;
           }
-          occupantCheck(direction);
-          return true;
+          return occupantCheck(direction);
 
         } else {
           ++heroX;
           return false;
         }
       }
-
     } else
       heroX = 0;
     break;
@@ -227,7 +233,7 @@ bool GameState::occupantCheck(int &direction) {
      * notified via pop-up already.
      */
     if (occ->typeStr() == "Diamond") {
-      direction = 'w'; 
+      direction = 'q'; // 'w' for "win"? Or is that what "return true" is for?
       return false;
     }
 
@@ -313,6 +319,7 @@ void GameState::HeroVision(int tempHeroY, int tempHeroX) {
         checkJ = j + 1;
     }
   }
+  map.tile_revealed(heroY + map.MinY, heroX + map.MinX);
 }
 
 void GameState::revealMap() {
@@ -364,6 +371,8 @@ void GameState::cursorTravel(int direction) {
     if (theHero.GetInventory().size())
       UI.displayInventory(theHero.GetInventory());
     break;
+  default:
+    break;
   }
   // Pass in tileType and Occupant to inspect
 
@@ -376,7 +385,7 @@ void GameState::cursorTravel(int direction) {
       //	if(details.size() % 2 == 0)
       //	{
       //	I think that details should give an even vector.
-      int i = details.size() / 2;
+      int i = details.size() / 2 + 1;
       temp = temp_type->toString();
       details.insert(details.begin(), temp);
       details.insert(details.begin() + i, "Grovnick");
@@ -391,6 +400,12 @@ void GameState::cursorTravel(int direction) {
       UI.tileInspect(details);
     }
   }
+  else{
+    temp = "Undiscovered";
+    details.push_back(temp);
+    details.push_back("Grovnick");
+    UI.tileInspect(details);
+  }
 
   // UI.tileInspect(temp_type, occupant_temp);
 }
@@ -399,8 +414,8 @@ bool GameState::ExpandMap() {
   int temp;
 
   // Explore down the map
-  if (heroY == map.MaxScreenY) {
-    --heroY;
+  if (heroY == map.MaxScreenY -2 && map.MaxY != map.MAPSIZE) {
+    //--heroY;
 
     temp = heroY + map.MinY;
 
@@ -422,8 +437,8 @@ bool GameState::ExpandMap() {
 
   }
   // Go back up
-  else if (heroY == -1) {
-    ++heroY;
+  else if (heroY == 2 && map.MinY != 0) {
+    //++heroY;
     temp = heroY + map.MinY;
 
     map.MinY -= (map.MaxScreenY / 2);
@@ -441,8 +456,8 @@ bool GameState::ExpandMap() {
   }
 
   // Explore right
-  else if (heroX == map.MenuBorder) {
-    --heroX;
+  else if (heroX == map.MenuBorder -2 && map.MaxX != map.MAPSIZE) {
+    //--heroX;
 
     temp = heroX + map.MinX;
 
@@ -464,8 +479,8 @@ bool GameState::ExpandMap() {
   }
 
   // explore left
-  else if (heroX == -1) {
-    ++heroX;
+  else if (heroX == 2 && map.MinX !=0) {
+    //++heroX;
 
     if (map.MinX != 0) {
 
@@ -560,9 +575,12 @@ void GameState::RunGame(WINDOW *win) {
 
   HeroVision();
   map.displayMap(win);
+
   UI.whifflesEnergy(theHero.whiffles(), theHero.energy());
   wattron(win, COLOR_PAIR(6));
   mvwprintw(win, heroY, heroX, "@");
+  cursorTravel(choice);
+  UI.actions(message);
   wmove(win, cursorY, cursorX);
   wrefresh(win);
 
