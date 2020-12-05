@@ -9,10 +9,10 @@ Tile::Tile() : revealed(false), type(0), occupant(0)
 
 Tile::~Tile()
 {
-	if(type)
-		delete type;
-	if(occupant)
-		delete occupant;
+    if(type)
+        delete type;
+    if(occupant)
+        delete occupant;
 }
 
 Map::Map(string srcFile, int & heroX, int & heroY)
@@ -26,21 +26,21 @@ Map::Map(string srcFile, int & heroX, int & heroY)
 
     MaxY = MaxScreenY;
     if(MenuBorder > 170)
-	    MenuBorder = MAPSIZE;
+        MenuBorder = MAPSIZE;
     else
-	    MenuBorder = MenuBorder - (3*MenuBorder/10);
+        MenuBorder = MenuBorder - (3*MenuBorder/10);
 
     MaxX = MenuBorder;
     
     MinX = 0;
     MinY = 0;
 
-	if(!(loadFile(srcFile, heroX, heroY)))
-	{
-		throw runtime_error("File cannot open");
-	}
+    if(!(loadFile(srcFile, heroX, heroY)))
+    {
+        throw runtime_error("File cannot open");
+    }
 
-	if(!(loadOccupants("exampleOccupantFile.txt")))
+    if(!(loadOccupants("exampleOccupantFile.txt")))
     {
           throw runtime_error("File cannot open");
     }
@@ -49,70 +49,23 @@ Map::Map(string srcFile, int & heroX, int & heroY)
 //Read in the map
 bool Map::loadFile(string src, int & heroX, int & heroY)
 {
-        string temp;
-        int i = 0;
-        int j = 0;
+  string temp;
+  int i = 0;
+  int j = 0;
 
-        //if(read_file==0)
-        ifstream infile;
-        //Open the designated file
-        //infile.open("practice.txt");
-	infile.open(src);
-	
-         //If file was open sucessfully then eneter
-        if(infile)
-        {
-		infile>>heroX;
-                infile.ignore(100,',');
-                infile>>heroY;
-                infile.ignore(100,'\n');
-          
-          /*
-                //If end of file is not triggered then enter the loop
-                while(getline(infile,temp))
-                {
-                        for(unsigned int k = 0;k<temp.size();++k)
-                        {
-
-                                if(j == MAPSIZE)
-                                {
-                                        ++i;
-                                        j=0;
-                                }
-
-				switch(temp[k])
-				{               
-					case 'W':
-						tileArray[i][j].type = new Water;//Color num 4
-						break;
-					case 'M':
-						tileArray[i][j].type = new Wall;//Color num 7
-						break;
-					case 'S':
-						tileArray[i][j].type = new Swamp; //Color num 5
-						break;
-					case 'G':
-						tileArray[i][j].type = new Meadow; //Color num 2
-						break;
-				}
-
-                                ++j;
-
-				//How should we go about occupants?
-
-                        }
-
-
-
-
-                }
-                infile.close();
-
-	} 
-	else {
-	  return false;
-	}
-  */
+  //if(read_file==0)
+  ifstream infile;
+  //Open the designated file
+  //infile.open("practice.txt");
+  infile.open(src);
+    
+     //If file was open sucessfully then eneter
+  if(infile)
+  {
+    infile>>heroX;
+    infile.ignore(100,',');
+    infile>>heroY;
+    infile.ignore(100,'\n');
 
     // If end of file is not triggered then enter the loop
     while (getline(infile, temp)) {
@@ -149,12 +102,6 @@ bool Map::loadFile(string src, int & heroX, int & heroY)
     return false;
   }
   
-  /*
-  attron(COLOR_PAIR(5));
-  mvwprintw(win,5 ,5," ");
-  wrefresh(win);
-  */
-
   return true; // placeholder for better things
 }
 
@@ -210,39 +157,39 @@ bool Map::loadOccupants(string src) {
 
 bool Map::saveFile(string dest, int heroX, int heroY)
 {
-	//Variable: Outfile
-	ofstream outfile;
-	//Open the data.txt files
+    //Variable: Outfile
+    ofstream outfile;
+    //Open the data.txt files
         outfile.open(dest);
-	//Clear what was in function
+    //Clear what was in function
         outfile.clear();
-	//Close the file
-	outfile.close();
-	//Reopen another file
+    //Close the file
+    outfile.close();
+    //Reopen another file
         outfile.open(dest, ios::app);
 
-	outfile<<"Last Position of Hero: "<<heroX<<","<<heroY<<endl;
-	//Loop through list.
-	
-	for(int i=0;i<MAPSIZE;++i)
-	{
-		for(int j = 0; j<MAPSIZE; ++j)
-		{
-			if(tileArray[i][j].type->toString() == "Meadow")
-				outfile<<"G";
-			else if(tileArray[i][j].type->toString() == "Water")
-				outfile<<"W";
-			else if(tileArray[i][j].type->toString() == "Wall")
-				outfile<<"M";
-			else if(tileArray[i][j].type->toString() == "Swamp")
-				outfile<<"S";
-		}
-		outfile<<endl;
-	}
-	//Close the file
+    outfile<<"Last Position of Hero: "<<heroX<<","<<heroY<<endl;
+    //Loop through list.
+    
+    for(int i=0;i<MAPSIZE;++i)
+    {
+        for(int j = 0; j<MAPSIZE; ++j)
+        {
+            if(tileArray[i][j].type->toString() == "Meadow")
+                outfile<<"G";
+            else if(tileArray[i][j].type->toString() == "Water")
+                outfile<<"W";
+            else if(tileArray[i][j].type->toString() == "Wall")
+                outfile<<"M";
+            else if(tileArray[i][j].type->toString() == "Swamp")
+                outfile<<"S";
+        }
+        outfile<<endl;
+    }
+    //Close the file
         outfile.close();
 
-	return true;
+    return true;
 }
 
 bool Map::saveOccupants(string dest) {
@@ -309,6 +256,32 @@ void Map::setOccupantAt(int col, int row, TileOccupant* newOccupant) {
         delete temp;
 
     temp = newOccupant;
+}
+
+// Can a ship be left on the tile at the provided coordinates
+bool Map::isDebarkSafe(int col, int row) {
+
+  // Can never leave ship in water
+  if (tileTypeAt(col, row)->toString() == "Water")
+    return false;
+
+  const Hero withoutShip{};
+
+  // Check all adjacent tiles
+  for (int i = 0; i < 9; ++i) {
+    int r = row + i%3 - 1;
+    int c = col + i/3 - 1;
+
+    if ((r >= 0) && (c >= 0) && (r < MAPSIZE) && (c < MAPSIZE) && 
+        (r != row || c != col)) {
+      if (tileTypeAt(c, r)->canEnter(withoutShip)) {
+        // Allow ship debarking if even one adjacent tile is walkable.
+        return true;
+      }
+    } 
+  }
+
+  return false;
 }
 
 // Have we been at tile before

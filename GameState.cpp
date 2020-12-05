@@ -32,8 +32,6 @@ GameState::GameState(string mapFile) : map(mapFile, heroX, heroY) {
 
 }
 
-
-
 GameState::~GameState() { map.saveFile("SavedFile.txt", heroX, heroY); }
 
 // Main travel function
@@ -196,13 +194,9 @@ bool GameState::occupantCheck(int &direction) {
    */
   int r = heroX + map.MinX;
   int c = heroY + map.MinY;
-  TileType *type = map.tileTypeAt(r, c);
   TileOccupant *occ = map.occupantAt(r, c);
 
-  /* If the hero is leaving water, then they leave their ship on the shore.
-   * Since this ship was already purchased, it has no cost.
-   */
-  bool debarkShip = (theHero.hasShip() && type->toString() != "Water");
+  bool debarkShip = (theHero.hasShip() && map.isDebarkSafe(r, c));
 
   // Not NULL, we have an occupant
   if (occ) {
@@ -233,7 +227,7 @@ bool GameState::occupantCheck(int &direction) {
      * notified via pop-up already.
      */
     if (occ->typeStr() == "Diamond") {
-      direction = 'q'; // 'w' for "win"? Or is that what "return true" is for?
+      direction = 'q'; 
       return false;
     }
 

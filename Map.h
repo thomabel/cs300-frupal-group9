@@ -9,13 +9,13 @@ using namespace std;
 #ifndef Map_CLASS
 #define Map_CLASS
 
-#include<ncurses.h>
-#include<vector>
-#include<cstring>
+#include <ncurses.h>
+#include <vector>
+#include <cstring>
 #include <string>
 #include <cmath>
-#include<fstream>
-#include<iostream>
+#include <fstream>
+#include <iostream>
 
 class TileOccupant;
 class TileType;
@@ -58,6 +58,7 @@ class Map
 		void tile_revealed(int row, int col);
         void revealAll();
 
+        bool isDebarkSafe(int col, int row);
 		bool isTileDiscovered(int col, int row);
 
 		void displayMap(WINDOW * win);
