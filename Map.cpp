@@ -40,7 +40,7 @@ Map::Map(string srcFile, int & heroX, int & heroY)
         throw runtime_error("File cannot open");
     }
 
-    if(!(loadOccupants("exampleOccupantFile.txt")))
+    if(!(loadOccupants("occupantFile.txt")))
     {
           throw runtime_error("File cannot open");
     }
