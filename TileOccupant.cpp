@@ -451,7 +451,7 @@ string Tool::promptMsg(Hero& theHero)
 {
 	string msg;
 
-	msg = "Tool found!\n";
+	msg = "Tool found! ";
 	if(theHero.whiffles() >= whiffleCost_)
 	{
 		/* msg = msg + name_ + "\n";
@@ -467,7 +467,7 @@ string Tool::promptMsg(Hero& theHero)
 		msg = msg + "X" + to_string(rating_) 
 			+ " : Rating\n"; */
 	
-		msg = msg + "Would you like to purchase? (Y/N):";
+		msg = msg + "Would you like to purchase? (Y/N)";
 	}
 	else
 	{

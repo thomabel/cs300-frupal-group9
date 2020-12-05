@@ -26,7 +26,7 @@ class GameState
 		bool occupantCheck(int & direction);
 		void HeroVision();
 		void HeroVision(int tempHeroY, int tempHeroX);
-		void revealMap();
+    void revealMap();
 		void RunGame(WINDOW * win);
 		void CursorInspect();
 	
