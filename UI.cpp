@@ -14,7 +14,7 @@ bool UserInterface::initialize(unsigned int width){
 
 	//xp = scrX * 3 / 10;
     xp = width;
-	y = scrY;
+	  y = scrY;
     x = xp;
     yl = 0;
     xl = scrX - xp;
