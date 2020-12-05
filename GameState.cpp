@@ -3,9 +3,6 @@
 
 GameState::GameState(string mapFile) : map(mapFile, heroX, heroY) {
   // string MapsrcFile = "Frupal.txt";
-
-  // Should start at Hero position
-
   
   int x;
   x = getmaxx(stdscr);
@@ -30,10 +27,35 @@ GameState::GameState(string mapFile) : map(mapFile, heroX, heroY) {
   }
   heroX = abs(heroX - map.MinX);
   heroY = abs(heroY - map.MinY);
+
+  ExpandMap();
+
+  if(heroX == map.MenuBorder-1)
+  {
+    heroX -= 1;
+    ExpandMap();
+    heroX += 1;
+  }
+  else if(heroX == 0){
+    heroX += 2;
+    ExpandMap();
+    heroX -= 2;
+  }
+  if(heroY == map.MaxScreenY-1){
+    heroY -= 1;
+    ExpandMap();
+    heroY += 1;
+  }
+  else if(heroY == 0){
+    heroY += 2;
+    ExpandMap();
+    heroY -= 2;
+  }
   cursorX = heroX;
   cursorY = heroY;
-
+  flagCursor = 0;
 }
+
 
 GameState::~GameState() { map.saveFile("SavedFile.txt", heroX, heroY); }
 
@@ -43,8 +65,13 @@ void GameState::travel(int &direction, WINDOW *win) {
   // move the cursor or exit the program due to not having
   // enough energy (Should Also not enter when Diamond is found)
   if (HeroTravel(direction)) {
+    if(flagCursor == 0)
+	    flagCursor = 1;
     // Enter if want to continue to explore the map
     if (ExpandMap()) {
+      cursorX = heroX;
+      cursorY = heroY;
+      CursorInspect();
       // Clear screen
       for (int i = 0; i < map.MaxScreenY; ++i) {
         for (int j = 0; j < map.MenuBorder; ++j) {
@@ -53,7 +80,6 @@ void GameState::travel(int &direction, WINDOW *win) {
         }
       }
     }
-
     // What the hero can see
     HeroVision();
 
@@ -68,6 +94,7 @@ void GameState::travel(int &direction, WINDOW *win) {
   }
   wmove(win, cursorY, cursorX);
   wrefresh(win);
+
 }
 
 // The hero traveling
@@ -179,7 +206,6 @@ bool GameState::HeroTravel(int &direction) {
           return false;
         }
       }
-
     } else
       heroX = 0;
     break;
@@ -198,16 +224,13 @@ bool GameState::occupantCheck(int &direction) {
    */
   int r = heroX + map.MinX;
   int c = heroY + map.MinY;
-  TileType *tileType = map.tileTypeAt(r, c);
+  TileType *type = map.tileTypeAt(r, c);
   TileOccupant *occ = map.occupantAt(r, c);
 
   /* If the hero is leaving water, then they leave their ship on the shore.
    * Since this ship was already purchased, it has no cost.
    */
-  if (theHero.hasShip() && tileType->toString() != "Water") {
-    map.setOccupantAt(r, c, new Ship(0, true));
-    theHero.setHasShip(false);
-  }
+  bool debarkShip = (theHero.hasShip() && type->toString() != "Water");
 
   // Not NULL, we have an occupant
   if (occ) {
@@ -215,11 +238,6 @@ bool GameState::occupantCheck(int &direction) {
 
     // Keep prompting user until they provide a valid response.
     do {
-      /* Give the user the appropriate pop-up for the encounter.
-       * TileOccupant::promptMsg() will give an appropriate message if
-       * the user cannot afford an item.
-       */
-
       // If encountering an Obstacle, the user needs to see their tool choices.
       if (occ->typeStr() == "Obstacle") {
         Obstacle *o = dynamic_cast<Obstacle *>(occ);
@@ -251,8 +269,17 @@ bool GameState::occupantCheck(int &direction) {
      * If not, remove it from the map.
      */
     if (!occ->permanent()) {
-      map.setOccupantAt(r, c, 0);
+      map.setOccupantAt(r, c, 0); // also deletes.
+      occ = 0;
     }
+  }
+
+  /* The ship can only be placed if there isn't already a TileOccupant. Do not
+   * use 'else'! The previous if statement modifies occ.
+   */
+  if(debarkShip && !occ) {
+    map.setOccupantAt(r, c, new Ship(0, true));
+    theHero.setHasShip(false);
   }
 
   return true;
@@ -329,11 +356,11 @@ void GameState::revealMap() {
 
 // Inspect tiles with cursor
 void GameState::cursorTravel(int direction) {
-  TileType *temp_type = NULL;
-  TileOccupant *occupant_temp = NULL;
-  string temp;
-  vector<string> details;
-
+  if(flagCursor == 1){
+    cursorX = heroX;
+    cursorY = heroY;
+    flagCursor = 0;
+  }
   switch (direction) {
   // These four cases is when user wants
   // to move cursor, and these cases move the
@@ -373,9 +400,18 @@ void GameState::cursorTravel(int direction) {
       UI.displayInventory(theHero.GetInventory());
     break;
   default:
-    break;
+    return;
   }
   // Pass in tileType and Occupant to inspect
+  CursorInspect();
+
+}
+
+void GameState::CursorInspect(){
+  TileType *temp_type = NULL;
+  TileOccupant *occupant_temp = NULL;
+  string temp;
+  vector<string> details;
 
   if (map.isTileDiscovered(cursorX + map.MinX, cursorY + map.MinY)) {
     temp_type = map.tileTypeAt(cursorX + map.MinX, cursorY + map.MinY);
@@ -407,8 +443,6 @@ void GameState::cursorTravel(int direction) {
     details.push_back("Grovnick");
     UI.tileInspect(details);
   }
-
-  // UI.tileInspect(temp_type, occupant_temp);
 }
 
 bool GameState::ExpandMap() {
@@ -434,6 +468,7 @@ bool GameState::ExpandMap() {
 
     heroY = abs((temp - map.MinY));
     heroX = heroX;
+
     return true;
 
   }
@@ -452,6 +487,7 @@ bool GameState::ExpandMap() {
 
     heroY = abs((temp - map.MinY));
     heroX = heroX;
+
     return true;
 
   }
@@ -476,6 +512,7 @@ bool GameState::ExpandMap() {
 
     heroX = abs(temp - map.MinX);
     heroY = heroY;
+
     return true;
   }
 
@@ -497,6 +534,8 @@ bool GameState::ExpandMap() {
 
       heroX = abs(temp - map.MinX);
       heroY = heroY;
+
+
       return true;
     }
   }
@@ -512,7 +551,7 @@ void GameState::RunGame(WINDOW *win) {
   UI.whifflesEnergy(theHero.whiffles(), theHero.energy());
   wattron(win, COLOR_PAIR(6));
   mvwprintw(win, heroY, heroX, "@");
-  cursorTravel(choice);
+  CursorInspect();
   UI.actions(message);
   wmove(win, cursorY, cursorX);
   wrefresh(win);
