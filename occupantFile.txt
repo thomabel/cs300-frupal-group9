@@ -127,7 +127,7 @@
 92,51,Food,Ice-Cold Beer,30,100
 101,25,Food,Ice-Cold Beer,30,100
 89,12,Food,Fried Rice,15,75
-105,9,Food,Senzu Bean,75,100
+105,9,Food,Senzu Bean,75,500
 84,3,Food,Fried Rice,15,75
 86,37,Food,Donut,10,15
 121,33,Food,Salad,1,1
@@ -150,7 +150,7 @@
 19,12,Food,Ice-Cold Beer,30,100
 17,38,Food,Ice-Cold Beer,30,100
 18,38,Food,Fried Rice,15,75
-64,17,Food,Senzu Bean,75,100
+64,17,Food,Senzu Bean,75,500
 21,56,Food,Fried Rice,15,75
 53,10,Food,Donut,10,15
 11,48,Food,Salad,1,1
