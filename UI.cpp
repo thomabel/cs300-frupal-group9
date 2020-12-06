@@ -14,7 +14,7 @@ bool UserInterface::initialize(unsigned int width){
 
 	//xp = scrX * 3 / 10;
     xp = width;
-	y = scrY;
+	  y = scrY;
     x = xp;
     yl = 0;
     xl = scrX - xp;
@@ -189,7 +189,7 @@ char UserInterface::displayInventory(
 // Popup with single string
 char UserInterface::popup(std::string message){
     char ch;
-
+  
     openPop();
     printTitle(pop, 0, 0, message);
     ch = getch();
@@ -259,8 +259,11 @@ void UserInterface::closePop(){
 void UserInterface::printTitle(
     WINDOW *win, int ypos, int hor_offset, std::string title){
     // Prints the title in the center.
-    int start;
-    start = (getmaxx(win) - title.length()) / 2;
+    int start = (getmaxx(win) - title.length()) / 2;
+
+    if (start < 0)
+        start = 0;
+
     mvwaddstr(win, ypos, start, title.data());
     return;
 }

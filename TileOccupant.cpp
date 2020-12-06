@@ -288,8 +288,7 @@ bool Ship::interact(char promptResponse, Hero& theHero)
      * the ship is new ...
      */
 	if( (theHero.whiffles() < whiffleCost_ && !bought_) ||
-        theHero.hasShip() )
-    {
+        theHero.hasShip()){
         // ... do nothing. Any input is valid, so return true.
 	    return true;
     }
@@ -303,7 +302,6 @@ bool Ship::interact(char promptResponse, Hero& theHero)
             theHero.addWhiffles(-whiffleCost_);
             bought_ = true;
         }
-
         toRemove_ = true;
         theHero.setHasShip(true);
         return true;
@@ -453,7 +451,7 @@ string Tool::promptMsg(Hero& theHero)
 {
 	string msg;
 
-	msg = "Tool found!\n";
+	msg = "Tool found! ";
 	if(theHero.whiffles() >= whiffleCost_)
 	{
 		/* msg = msg + name_ + "\n";
@@ -469,7 +467,7 @@ string Tool::promptMsg(Hero& theHero)
 		msg = msg + "X" + to_string(rating_) 
 			+ " : Rating\n"; */
 	
-		msg = msg + "Would you like to purchase? (Y/N):";
+		msg = msg + "Would you like to purchase? (Y/N)";
 	}
 	else
 	{
@@ -1029,7 +1027,6 @@ bool Obstacle::interact(char promptResponse, Hero& theHero)
         theHero.addEnergy(-energyCost_);
         return true;
     }
- 
     // A tool was chosen. Check if the promptResponse is invalid.
     if (toolInd < 0 || toolInd >= static_cast<int>(usableTools.size()))  {
         return false;
@@ -1040,7 +1037,7 @@ bool Obstacle::interact(char promptResponse, Hero& theHero)
 
     if (!chosenTool)
         throw std::runtime_error("missing tool");
-
+  
     // Cost is reduced by a factor of the rating, rounding up.
     energyCost_ = ceil(static_cast<float>(energyCost_) / 
         chosenTool->rating());
