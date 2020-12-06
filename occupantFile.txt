@@ -202,7 +202,7 @@
 46,98,Treasure,25
 33,108,Treasure,25
 57,110,Tool,Tiger Sleeping Potion,100,20,5,Tiger of Frupal,Tiger of the North,Tiger of the East,Tiger of the South,Tiger of the West
- 28,102,Treasure,10
+28,102,Treasure,10
 37,116,Treasure,25
 19,114,Treasure,25
 //Mountains
