@@ -1,4 +1,5 @@
-59
+214
+
 // First Quadrant
 51,127,Diamond
 72,76,Binoculars,750
@@ -7,33 +8,52 @@
 122,105,Ship,150
 
 // Dock
-102,122,Donut,8,4
-106,116,Fried Rice,15,20
-100,109,Treasure,25
+69,97,Food,Donut,8,50
+78,118,Food,Fried Rice,15,75
+71,104,Food,Ice-Cold Beer,30,100
+90,92,Food,Donut,8,50
+103,95,Food,Fried Rice,15,75
+81,81,Food,Ice-Cold Beer,30,100
+92,82,Food,Ham,14,60
+102,114,Food,Donut,8,50
+76,99,Food,Fried Rice,15,75
+82,93,Food,Ice-Cold Beer,30,100
+98,87,Food,Ham,14,60
+97,74,Food,Donut,8,50
+107,71,Food,Fried Rice,15,75
+117,102,Food,Ice-Cold Beer,30,100
+100,103,Food,Ham,14,60
+114,94,Food,Donut,8,50
+115,79,Food,Fried Rice,15,75
+79,70,Food,Ice-Cold Beer,30,100
+79,109,Food,Ham,14,60
+110,85,Treasure,25
+94,99,Treasure,25
+83,107,Treasure,25
+102,122,Food,Donut,8,50
+106,116,Food,Fried Rice,15,75
+100,109,Treasure,250
 107,98,Treasure,50
 99,94,Treasure,100
-90,107,Ham,14,12
+90,107,Food,Ham,14,60
 91,108,Treasure,25
 96,90,Treasure,50
-91,81,Donut,8,4
-88,98,Ham,14,12
+91,81,Food,Donut,8,50
+88,98,Food,Ham,14,60
 104,110,Tool,Handful of Salt,50,10,1,Passive-Agressive Slugs
-
 95,100,Obstacle,Passive-Agressive Slugs,10
 121,105,Obstacle,Passive-Agressive Slugs,10
 107,102,Obstacle,Passive-Agressive Slugs,10
-110,78,Obstacle,Passive-Agressive Slugs,10
+119,81,Obstacle,Tiger of the East,40
 108,74,Treasure,25
 112,74,Treasure,10
 114,73,Obstacle,Passive-Agressive Slugs,10
-
 119,81,Obstacle,Tiger of the East,40
 124,87,Treasure,200
 125,86,Treasure,50
-122,87,Ice-Cold Beer,30,25
-125,84,Ham,14,12
+122,87,Food,Ice-Cold Beer,30,100
+125,84,Food,Ham,14,60
 124,87,Tool,Handful of Salt,50,10,1,Passive-Agressive Slugs
-
 85,101,Treasure,50
 79,122,Treasure,25
 127,127,Treasure,50
@@ -55,7 +75,7 @@
 76,108,Treasure,15
 72,120,Treasure,175
 84,112,Food,Jacob's Croissant,12,1
-82,90,Fried Rice,15,20
+82,90,Food,Fried Rice,15,75
 
 // East Caves
 103,65,Obstacle,Boulder,12
@@ -64,7 +84,19 @@
 102,65,Obstacle,Man-Eating Grue,15
 101,64,Obstacle,Man-Eating Grue,15
 108,57,Treasure,500
-98,69,Tool,Handful of Salt,50,10,1,Passive Agressive Slugs
+98,69,Tool,Handful of Salt,50,10,1,Passive-Agressive Slugs
+91,57,Food,Fried Rice,15,75
+96,63,Food,Ice-Cold Beer,30,100
+115,66,Food,Ham,14,60
+118,55,Food,Donut,8,50
+108,48,Food,Fried Rice,15,75
+118,46,Food,Ice-Cold Beer,30,100
+113,36,Food,Ham,14,60
+101,41,Food,Donut,8,50
+104,62,Treasure,50
+95,48,Treasure,25
+112,46,Treasure,100
+90,41,Treasure,50
 
 // Trees
 89,77,Obstacle,Tree,7
@@ -72,3 +104,136 @@
 110,90,Tool,Worn Power-saw,20,3,1,Tree
 69,69,Obstacle,Pogchamp,1
 74,67,Tool,Hacking Axe,25,3,1,Tree
+
+//North East
+106,40,Obstacle,Tree,7
+90,29,Obstacle,Tree,7
+115,24,Obstacle,Tree,7
+85,16,Obstacle,Tree,7
+86,83,Obstacle,Tree,7
+81,4,Obstacle,Tiger of the North,40
+95,20,Obstacle,Passive-Agressive Slugs,10
+85,8,Obstacle,Passive-Agressive Slugs,10
+120,52,Obstacle,Passive-Agressive Slugs,10
+123,42,Obstacle,Passive-Agressive Slugs,10
+104,35,Obstacle,boulder,60
+105,24,Obstacle,boulder,60
+116,37,Obstacle,boulder,60
+113,51,Obstacle,Snake Pile,18
+97,45,Obstacle,Snake Pile,18
+103,17,Tool,bazooka,100,30,4,boulder,fence,Passive-Agressive Slugs,Tree
+100,10,Tool,Tiger Sleeping Potion,100,20,5,Tiger of Frupal,Tiger of the North,Tiger of the East,Tiger of the South,Tiger of the West
+117,51,Tool,Clay-Transform Potion,100,6,1,Snake Pile,Passive-Aggressive Slugs 
+92,51,Food,Ice-Cold Beer,30,100
+101,25,Food,Ice-Cold Beer,30,100
+89,12,Food,Fried Rice,15,75
+105,9,Food,Senzu Bean,75,500
+84,3,Food,Fried Rice,15,75
+86,37,Food,Donut,10,15
+121,33,Food,Salad,1,1
+109,28,Food,Ham,14,60
+94,38,Food,Fried Rice,15,75 
+81,3,Treasure,25
+108,11,Treasure,50
+127,1,Treasure,1000
+80,13,Treasure,10
+122,43,Treasure,150
+78,32,Treasure,75
+106,29,Treasure,75
+117,29,Treasure,75
+
+//Castle
+51,38,Tool,Kamehameha; Blast of Destruction,75,3,1,The Indestructible Door
+57,22,Tool,Clay-Transform Potion,100,6,1,Snake Pile,Passive-Aggressive Slugs
+41,51,Tool,Torch,75,3,1,Man-Eating Grue
+33,51,Tool,Torch,75,3,1,Man-Eating Grue 
+19,12,Food,Ice-Cold Beer,30,100
+17,38,Food,Ice-Cold Beer,30,100
+18,38,Food,Fried Rice,15,75
+64,17,Food,Senzu Bean,75,500
+21,56,Food,Fried Rice,15,75
+53,10,Food,Donut,10,15
+11,48,Food,Salad,1,1
+43,13,Food,Ham,14,60
+7,22,Food,Fried Rice,15,75 
+23,28,Treasure,20
+18,23,Treasure,50
+43,19,Treasure,10
+44,38,Treasure,25
+60,13,Treasure,25
+11,33,Treasure,80
+20,6,Treasure,25
+25,22,0,Treasure,25
+36,51,Treasure,10
+3,4,Treasure,80
+37,18,Obstacle,Tiger of Frupal,100
+27,33,Obstacle,Tiger of the West,60 
+17,29,Obstacle,Man-Eating Grue,15
+49,28,Obstacle,Man-Eating Grue,15
+24,30,Obstacle,Man-Eating Grue,15
+36,46,Obstacle,Man-Eating Grue,15
+34,29,Obstacle,Hole,10
+27,27,Obstacle,Hole,10
+16,21,Obstacle,Boulder,12
+39,33,Obstacle,Boulder,12
+36,49,Obstacle,Fence,5
+37,49,Obstacle,Fence,5
+38,49,Obstacle,Fence,5
+
+
+//West Swamp 
+40,63,Food,Ice-Cold Beer,30,100
+34,55 ,Food,Fried Rice,15,75
+53,81,Food,Fried Rice,15,75
+45,86,Food,Fried Rice,15,75
+40,92,Food,Donut,10,15
+29,89,Food,Donut,10,15
+10,60,Food,Ice-Cold Beer,30,100
+5,77,Food,Fried Rice,15,75
+50,62,Food,Fried Rice,15,75
+35,74,Food,Fried Rice,15,75
+16,78,Food,Donut,10,15
+32,61,Food,Donut,10,15
+38,84,Food,Ham,14,60
+20,88,Food,Fried Rice,15,75 
+40,76,Tool,Clay-Transform Potion,100,6,1,Snake Pile,Passive Aggressive Slugs
+44,71,Tool,Plunger Launcher,245,10,1,Quicksand
+31,75,Tool,Tiger Sleeping Potion,100,20,5,Tiger of Frupal,Tiger of the North,Tiger of the East,Tiger of the South,Tiger of the West
+44,81,Obstacle,Snake Pile,18
+23,76,Obstacle,Snake Pile,18
+45,75,Obstacle,Snake Pile,18
+21,81,Obstacle,Quicksand,35
+29,86,Obstacle,Quicksand,35
+50,78,Treasure,20
+31,72 ,Treasure,10
+3,78,Treasure,25
+35,78,Treasure,25
+
+//Village
+3,49,Treasure,250
+18,103,Food,Ice-Cold Beer,30,100
+36,99,Food,Fried Rice,15,75
+23,114,Food,Fried Rice,15,75
+45,108,Food,Donut,10,15
+19,103,Food,Ice-Cold Beer,30,100
+25,95,Food,Fried Rice,15,75
+46,93,Food,Fried Rice,15,75
+58,80,Food,Donut,10,15
+54,97,Food,Donut,10,15
+28,106,Food,Ham,14,60
+30,94,Treasure,10
+46,98,Treasure,25
+33,108,Treasure,25
+57,110,Tool,Tiger Sleeping Potion,100,20,5,Tiger of Frupal,Tiger of the North,Tiger of the East,Tiger of the South,Tiger of the West
+ 28,102,Treasure,10
+37,116,Treasure,25
+19,114,Treasure,25
+
+//Mountains
+51,127,Diamond
+36,119,Obstacle,The Indestructible Door,50
+20,117,Obstacle,Tiger of the South,80
+28,121,Food,Ice-Cold Beer,30,100
+35,125,Food,Fried Rice,15,75
+49,123,Food,Donut,10,15
+4,119,Food,Donut,10,15
