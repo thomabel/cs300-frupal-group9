@@ -10,8 +10,7 @@ Hero::Hero(){
     hasBinoculars_ = false;
     hasShip_ = false;
     whiffles_ = 1000;
-    //energy_ = 100;
-    energy_ = 10000;
+    energy_ = 100;
 }
 
 Hero::Hero(const  Hero & orig){

@@ -86,12 +86,6 @@ bool GameState::HeroTravel(int &direction) {
         if (temp_type->canEnter(theHero)) {
           // Make sure take away the energy needed to get here
           theHero.addEnergy((temp_type->energyCost() * -1));
-          // Make sure we still have enough energy
-          if (theHero.energy() <= 0) {
-            // If we don't then exit the program
-            direction = 'q';
-            return false;
-          }
           // Check our occupant
           return occupantCheck(direction);
         } else {
@@ -113,10 +107,6 @@ bool GameState::HeroTravel(int &direction) {
         temp_type = map.tileTypeAt(heroX + map.MinX, heroY + map.MinY);
         if (temp_type->canEnter(theHero)) {
           theHero.addEnergy((temp_type->energyCost() * -1));
-          if (theHero.energy() <= 0) {
-            direction = 'q';
-            return false;
-          }
           return occupantCheck(direction);
 
         } else {
@@ -139,10 +129,6 @@ bool GameState::HeroTravel(int &direction) {
         temp_type = map.tileTypeAt(heroX + map.MinX, heroY + map.MinY);
         if (temp_type->canEnter(theHero)) {
           theHero.addEnergy((temp_type->energyCost() * -1));
-          if (theHero.energy() <= 0) {
-            direction = 'q';
-            return false;
-          }
           return occupantCheck(direction);
 
         } else {
@@ -165,10 +151,6 @@ bool GameState::HeroTravel(int &direction) {
         temp_type = map.tileTypeAt(heroX + map.MinX, heroY + map.MinY);
         if (temp_type->canEnter(theHero)) {
           theHero.addEnergy((temp_type->energyCost() * -1));
-          if (theHero.energy() <= 0) {
-            direction = 'q';
-            return false;
-          }
           return occupantCheck(direction);
 
         } else {
@@ -198,6 +180,17 @@ bool GameState::occupantCheck(int &direction) {
 
   bool debarkShip = (theHero.hasShip() && map.isDebarkSafe(r, c));
 
+  // End the game if the Hero is out of energy.
+  if (theHero.energy() <= 0) {
+    char response;
+    do {
+      response = UI.popup(string("You ran out of energy and can no longer") 
+        + "move! Game over. Press 'q' to quit. ", vector<string>{});
+    } while (response != 'q');
+    direction = 'q';
+    return false;
+  }
+
   // Not NULL, we have an occupant
   if (occ) {
     char response = 0;
@@ -214,14 +207,6 @@ bool GameState::occupantCheck(int &direction) {
       }
 
     } while (!occ->interact(response, theHero));
-
-    /* End the game if the Hero is out of energy. The user has been
-     * notified via pop-up already.
-     */
-    if (theHero.energy() <= 0) {
-      direction = 'q';
-      return false;
-    }
 
     /* End the game if the Hero found a diamond. The user has been
      * notified via pop-up already.
