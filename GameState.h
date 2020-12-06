@@ -28,6 +28,7 @@ class GameState
 		void HeroVision(int tempHeroY, int tempHeroX);
     void revealMap();
 		void RunGame(WINDOW * win);
+		void CursorInspect();
 	
 	private:
 		Hero theHero;
@@ -38,5 +39,6 @@ class GameState
 		int cursorY;
 		int heroX;
 		int heroY;
+		int flagCursor;
 };
 #endif
